@@ -392,7 +392,8 @@ ggplot(vendeurs, aes(x = b_sexe, y = Td_predites)) +
   labs(title = "Prédictions du modèle de régression logistique",
        x = "b_sexe",
        y = "Td") +
-  theme_minimal()
+  theme_minimal() 
+
 ################################################################################################################################################ 
 
 
@@ -417,13 +418,23 @@ vend.rtrunc <- vendeurs$rtrunc
 
 clones.list <- split.data.frame(clones, clones$jd)
 
+
+
 tirage <- function(data, nb.obs) {
   echantillon <-  sample(1:nrow(data), size = nb.obs, replace = FALSE)
   data <- data[echantillon,]
   return(data)
 }
 
-clones.list <- lapply(clones.list, tirage, nb.obs = 3)
+
+tirage2 <- function(data, nb.obs) {
+  echantillon <-  sample(1:nrow(data), size = nb.obs, replace = TRUE)
+  data <- data[echantillon,]
+  return(data)
+}
+
+
+clones.list <- lapply(clones.list, tirage2, nb.obs = 10)
 clones <- do.call(rbind, clones.list)
 
 rm(clones.list, tirage)
@@ -467,6 +478,30 @@ ggplot(data = estimations, aes(x = time, y = survival)) +
   scale_y_continuous(labels = scales::percent) +
   scale_x_continuous(breaks = quantile(vend.Td),
                      labels = function(x) round(x/365.25, digits = 0))
+
+ggplot(data = estimations, aes(x = time, y = survival)) +
+  geom_line(aes(group = groupe, colour = groupe)) +
+  geom_ribbon(aes(group = groupe, fill = groupe, ymin = CI.lower, ymax = CI.upper), 
+              alpha = 0.3) +  # alpha = 0.3 pour rendre l'intervalle de confiance plus transparent
+  labs(title = "Estimation des survie (avec 95% IC)",
+       x = "Années",
+       y = "Fonction de survie") +
+  theme_minimal() +  # Utiliser un thème minimal
+  theme(panel.grid.major = element_blank(),  # Enlever la grille
+        panel.grid.minor = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1),  # Faire pivoter les étiquettes de l'axe x pour une meilleure lisibilité
+        legend.position = "right",  # Placer la légende à droite
+        legend.title = element_blank(),
+        legend.text = element_text(size = 10),
+        axis.title.y = element_text(vjust = 1)) +  # Ajuster la position du titre de l'axe y
+  scale_y_continuous(labels = scales::percent,
+                     limits = c(0, 1), 
+                     expand = c(0, 0),  # Déplacer les options limits et expand dans scale_y_continuous
+                     breaks = seq(0, 1, 0.1)) +  # Ajouter des étiquettes d'axe y avec un intervalle de 0.1
+  scale_x_continuous(breaks = seq(0, max(estimations$time), by = 365.25*2),  # Définir les étiquettes de l'axe x avec un intervalle de deux ans
+                     labels = function(x) ifelse(x %% 365.25 == 0, round(x/365.25, digits = 0), "")) +
+  guides(colour = guide_legend(title = "Groupes"),  # Ajouter un titre à la légende des couleurs
+         fill = guide_legend(title = "Groupes")) 
 
 
 ##################
