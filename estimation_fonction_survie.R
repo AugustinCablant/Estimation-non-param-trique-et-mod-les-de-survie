@@ -13,7 +13,7 @@ library(ggplot2)
 library(progress)
 library(frailtyEM)
 library(glm2)
-
+library(gridExtra)
 #library(survminer)
 
 
@@ -428,38 +428,207 @@ summary(vendeurs $ annuity)
 
 
 
-# 15) Régression par MCO de Td^{seller} sur sexe 
+# 15) Régression par MCO de Td^{seller} sur sexe, region, bouquet, rente, vente à une têtes 
 
-## Je commence par créer la variable adéquat étant donné que nous voulons que sexe 
-## prenne 0 ou 1. Ici 0 est pour les hommes, 1 pour les femmes. 
+## Je commence par créer les variables nécessaires  
 
-vendeurs $ sexe = vendeurs $ b_sexe - 1
+vendeurs_MCO = vendeurs
+vendeurs_MCO$sexe_homme = as.numeric(vendeurs_MCO$b_sexe==1)
+vendeurs_MCO$idf = as.numeric(vendeurs_MCO$b_dep %in% c(75,78,91,92,93,94,95))
+vendeurs_MCO$etranger = as.numeric(vendeurs_MCO$b_dep==99)
+vendeurs_MCO$une_tete = as.numeric(vendeurs_MCO$nb_tete==1)
+vendeurs_MCO$rente = vendeurs_MCO$annuity
+vendeurs_MCO$bouquet = vendeurs_MCO$downp
 
-modele_regression <- lm(Td ~ sexe, data = vendeurs)
+
+modele_regression <- lm(Td ~ sexe_homme + idf + etranger + une_tete + rente + bouquet , data = vendeurs_MCO)
 summary(modele_regression)
-ggplot(data = vendeurs, aes(x = sexe, y = Td)) +
-  geom_point() +                      # Nuage de points
-  geom_smooth(method = "lm", se = FALSE, color = "blue") +  # Droite de régression
-  labs(title = "Régression linéaire de Td sur sexe",
-       x = "sexe",
-       y = "Td") +
-  theme_minimal()
 
-## Cas de la régression logistique :
-modele_regression_logistique <- glm(Td ~ b_sexe, data = vendeurs)
+p1 <- ggplot(data = vendeurs_MCO, aes(x = sexe_homme, y = Td)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  xlab("sexe_homme") +
+  ylab("Td") +
+  ggtitle("Régression linéaire : Td en fonction de sexe_homme")
 
-summary(modele_regression_logistique)
+p2 <- ggplot(data = vendeurs_MCO, aes(x = idf, y = Td)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  xlab("idf") +
+  ylab("Td") +
+  ggtitle("Régression linéaire : Td en fonction de idf")
 
-vendeurs$Td_predites <- predict(modele_regression_logistique, newdata = vendeurs, type = "response")
+p3 <- ggplot(data = vendeurs_MCO, aes(x = etranger, y = Td)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  xlab("etranger") +
+  ylab("Td") +
+  ggtitle("Régression linéaire : Td en fonction de etranger")
 
-# Tracer les prédictions du modèle
-ggplot(vendeurs, aes(x = b_sexe, y = Td_predites)) +
-  geom_point(aes(y = Td), color = "blue", alpha = 0.5) +  # Afficher les points réels (Td observés) en bleu
-  geom_line(color = "red") +  # Tracer la courbe de prédiction du modèle en rouge
-  labs(title = "Prédictions du modèle de régression logistique",
-       x = "b_sexe",
-       y = "Td") +
-  theme_minimal() 
+p4 <- ggplot(data = vendeurs_MCO, aes(x = une_tete, y = Td)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  xlab("une_tete") +
+  ylab("Td") +
+  ggtitle("Régression linéaire : Td en fonction de une_tete")
+
+p5 <- ggplot(data = vendeurs_MCO, aes(x = rente, y = Td)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  xlab("rente") +
+  ylab("Td") +
+  ggtitle("Régression linéaire : Td en fonction de rente")
+
+p6 <- ggplot(data = vendeurs_MCO, aes(x = bouquet, y = Td)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  xlab("bouquet") +
+  ylab("Td") +
+  ggtitle("Régression linéaire : Td en fonction de bouquet")
+
+
+grid.arrange(p1, p2, p3, p4, p5, p6, ncol = 2)
+
+
+
+# Créer un data frame avec les valeurs prédites et les valeurs observées
+predictions <- data.frame(Y_obs = vendeurs_MCO$Td, Y_pred = fitted(modele_regression) )
+
+# Créer le graphique de dispersion avec une ligne de régression ajustée
+ggplot(data = predictions, aes(x = Y_obs, y = Y_pred)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1, color = "blue", linetype = "dashed") +
+  xlab("Valeurs observées de Td") +
+  ylab("Valeurs prédites de Td") +
+  ggtitle("Régression linéaire par mCO de Td sur sexe, region, bouquet, rente, vente à une têtes")
+
+
+########
+
+
+# 16) Régression par MCO de Tr^{seller} sur sexe, region, bouquet, rente, vente à une têtes 
+
+modele_regression <- lm(Tr ~ sexe_homme + idf + etranger + une_tete + rente + bouquet , data = vendeurs_MCO)
+summary(modele_regression)
+
+p1 <- ggplot(data = vendeurs_MCO, aes(x = sexe_homme, y = Tr)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  xlab("sexe_homme") +
+  ylab("Tr") +
+  ggtitle("Régression linéaire : Tr en fonction de sexe_homme")
+
+p2 <- ggplot(data = vendeurs_MCO, aes(x = idf, y = Tr)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  xlab("idf") +
+  ylab("Tr") +
+  ggtitle("Régression linéaire : Tr en fonction de idf")
+
+p3 <- ggplot(data = vendeurs_MCO, aes(x = etranger, y = Tr)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  xlab("etranger") +
+  ylab("Tr") +
+  ggtitle("Régression linéaire : Tr en fonction de etranger")
+
+p4 <- ggplot(data = vendeurs_MCO, aes(x = une_tete, y = Tr)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  xlab("une_tete") +
+  ylab("Tr") +
+  ggtitle("Régression linéaire : Tr en fonction de une_tete")
+
+p5 <- ggplot(data = vendeurs_MCO, aes(x = rente, y = Tr)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  xlab("rente") +
+  ylab("Tr") +
+  ggtitle("Régression linéaire : Tr en fonction de rente")
+
+p6 <- ggplot(data = vendeurs_MCO, aes(x = bouquet, y = Tr)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  xlab("bouquet") +
+  ylab("Tr") +
+  ggtitle("Régression linéaire : Tr en fonction de bouquet")
+
+
+grid.arrange(p1, p2, p3, p4, p5, p6, ncol = 2)
+
+# Créer un data frame avec les valeurs prédites et les valeurs observées
+predictions <- data.frame(Y_obs = vendeurs_MCO$Tr, Y_pred = fitted(modele_regression) )
+
+# Créer le graphique de dispersion avec une ligne de régression ajustée
+ggplot(data = predictions, aes(x = Y_obs, y = Y_pred)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1, color = "blue", linetype = "dashed") +
+  xlab("Valeurs observées de Tr") +
+  ylab("Valeurs prédites de Tr") +
+  ggtitle("Régression linéaire par MCO de Tr sur sexe, region, bouquet, rente, vente à une têtes")
+
+
+##########
+
+
+# 17) Régression par MCO de T_{dif} sur sexe, region, bouquet, rente, vente à une têtes
+clones_MCO = clones
+clones_MCO$sexe_homme = as.numeric(clones_MCO$b_sexe==1)
+clones_MCO$idf = as.numeric(clones_MCO$old_b_dep %in% c(75,78,91,92,93,94,95))
+clones_MCO$etranger = as.numeric(clones_MCO$old_b_dep==99)
+clones_MCO$une_tete = as.numeric(clones_MCO$nb_tete==1)
+
+
+modele_regression <- lm(Tr_dif ~ sexe_homme + idf + etranger + une_tete , data = clones_MCO)
+summary(modele_regression)
+
+p1 <- ggplot(data = clones_MCO, aes(x = sexe_homme, y = Tr_dif)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  xlab("sexe_homme") +
+  ylab("Tr_dif") +
+  ggtitle("Régression linéaire : Tr_dif en fonction de sexe_homme")
+
+p2 <- ggplot(data = clones_MCO, aes(x = idf, y = Tr_dif)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  xlab("idf") +
+  ylab("Tr_dif") +
+  ggtitle("Régression linéaire : Tr_dif en fonction de idf")
+
+p3 <- ggplot(data = clones_MCO, aes(x = etranger, y = Tr_dif)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  xlab("etranger") +
+  ylab("Tr_dif") +
+  ggtitle("Régression linéaire : Tr_dif en fonction de etranger")
+
+p4 <- ggplot(data = clones_MCO, aes(x = une_tete, y = Tr_dif)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  xlab("une_tete") +
+  ylab("Tr_dif") +
+  ggtitle("Régression linéaire : Tr_dif en fonction de une_tete")
+
+
+
+grid.arrange(p1, p2, p3, p4, p5, p6, ncol = 2)
+
+# Créer un data frame avec les valeurs prédites et les valeurs observées
+predictions <- data.frame(Y_obs = clones_MCO$Tr_dif, Y_pred = fitted(modele_regression) )
+
+# Créer le graphique de dispersion avec une ligne de régression ajustée
+ggplot(data = predictions, aes(x = Y_obs, y = Y_pred)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1, color = "blue", linetype = "dashed") +
+  xlab("Valeurs observées de Tr_dif") +
+  ylab("Valeurs prédites de Tr_dif") +
+  ggtitle("Régression linéaire par MCO de Tr_dif sur sexe, region, vente à une têtes")
+
+#########
+
+# 18) Régression logistique de indicatrice(Tr_dif > 0) sur sexe, region, bouquet, rente, vente à une têtes 
+
 
 ################################################################################################################################################ 
 
