@@ -1,4 +1,4 @@
-# Packages
+###### Install packages
 #install.packages('survival')
 #install.packages('SurvTrunc')
 #install.packages('ggplot2')
@@ -13,6 +13,7 @@ library(ggplot2)
 library(progress)
 library(frailtyEM)
 library(glm2)
+
 #library(survminer)
 
 
@@ -27,6 +28,11 @@ table(donnees$groupe)
 
 ##############################################################################################################
 # Créer les variables que nous allons utiliser (à faire une fois)
+# Ce code créer le data frame de travail que nous utiliserons ensuite 
+# Il suppose que les variables Td, rtrunc, ltrunc, Tr, nb_tete (nombre de tetes sur la vente)
+# head (vaut 1 (resp.2) si tête 1 (resp. 2) en présence) aient été crées chez les vendeurs
+
+
 donnees$Tr_dif <- 0
 
 liste_jd <- unique(donnees[donnees$groupe == 'seller', 'jd'])
@@ -62,6 +68,9 @@ sample(donnees[indices_aleatoires, c("Tr_dif", "rtrunc", "ltrunc","head","nb_tet
 write.csv(donnees, file = "/Users/augustincablant/Desktop/Viagers/merge_clone_seller.csv", row.names = FALSE)
 ##############################################################################################################
 
+
+
+
 # Autres data frames que nous allons utiliser
 femmes <- subset(donnees, b_sexe == 2)
 hommes <- subset(donnees, b_sexe == 1)
@@ -69,7 +78,8 @@ vendeurs <- subset(donnees, groupe == "seller")
 clones <- subset(donnees,groupe == "clone")
 
 
-#################################### Statistiques descriptives#################################### 
+#################################### I - Statistiques descriptives #################################### 
+# Nous commençons par une section statistiques descriptives, elles ne sont pas exhaustives
 
 # Vendeurs vs. Clones
 table(donnees$groupe)
@@ -134,7 +144,7 @@ axis(side = 2, c(-2.2, 1.7), lwd = 3.5, labels = c("",""), lwd.ticks = -1)
 #### 
 
 
-######## 
+######## Quelques stat des demandées par Mr Visser (numérotées comme ds le overleaf)
 
 # 1) Stat des sur Tr 
 summary(vendeurs $ Tr_seller)
@@ -151,7 +161,9 @@ plot(densite_seller, col = "brown", lwd = 3, main = "Densités de Tr_seller et T
 lines(densite_clone, col = "cyan", lwd = 3)
 legend("topright", legend = c("Tr_seller", "Tr_clone"), col = c("cyan", "brown"), lwd = 3, bty = "n")
 
+
 ##########
+
 
 # 2) Stat def sur Tr_dif
 summary(donnees $ Tr_dif)
@@ -162,7 +174,6 @@ densite <- density(donnees_sans_na)
 plot(densite, col = "lightblue", lwd = 3, main = "Densités de Tr_dif")
 legend("topright", legend = c("Tr_dif"), col = c("lightblue"), lwd = 3, bty = "n")
 
-##########
 
 ######## Distinction sur les têtes 
 unetete <- donnees[donnees$nb_tete == 1, ]
@@ -173,6 +184,10 @@ deuxtete <- donnees[donnees$nb_tete == 2, ]
 deuxtete_tete1 <- deuxtete[deuxtete$head == 1, ]
 deuxtete_tete2 <- deuxtete[deuxtete$head == 2, ]
 
+
+##########
+
+
 # 3) Stat des sur Tr_dif sur les ventes à une tête 
 summary(unetete $ Tr_dif)
 resultat_test <- t.test(unetete$ Tr_dif, mu = 0)
@@ -181,6 +196,10 @@ donnees_sans_na <- na.omit(unetete$Tr_dif)
 densite <- density(donnees_sans_na)
 plot(densite, col = "orange", lwd = 3, main = "Densités de Tr_dif pour les ventes à une tête")
 legend("topright", legend = c("Tr_dif"), col = c("orange"), lwd = 3, bty = "n")
+
+
+##########
+
 
 # 4) Stat des sur Tr_dif sur les ventes à deux têtes, focus sur la tête 1 
 summary(deuxtete_tete1 $ Tr_dif)
@@ -191,6 +210,10 @@ densite <- density(donnees_sans_na)
 plot(densite, col = "magenta", lwd = 3, main = "Densités de Tr_dif pour la tete 1 des ventes à deux têtes ")
 legend("topright", legend = c("Tr_dif"), col = c("magenta"), lwd = 3, bty = "n")
 
+
+##########
+
+
 # 5) Stat des sur Tr_dif sur les ventes à deux têtes, focus sur la tête 2 
 summary(deuxtete_tete2 $ Tr_dif)
 resultat_test <- t.test(deuxtete_tete2$ Tr_dif, mu = 0)
@@ -199,6 +222,11 @@ donnees_sans_na <- na.omit(deuxtete_tete2$Tr_dif)
 densite <- density(donnees_sans_na)
 plot(densite, col = "cyan", lwd = 3, main = "Densités de Tr_dif pour la tete 2 des ventes à deux têtes ")
 legend("topright", legend = c("Tr_dif"), col = c("cyan"), lwd = 3, bty = "n")
+
+
+##########
+
+
 
 # 6) Stat des sur Tr_dif sur les ventes à une tête femme
 summary(unetete_femme $ Tr_dif)
@@ -209,6 +237,10 @@ densite <- density(donnees_sans_na)
 plot(densite, col = "red", lwd = 3, main = "Densités de Tr_dif pour les ventes à une tête (femmes")
 legend("topright", legend = c("Tr_dif"), col = c("red"), lwd = 3, bty = "n")
 
+
+##########
+
+
 # 7) Stat des sur Tr_dif sur les ventes à une tête homme
 summary(unetete_homme $ Tr_dif)
 resultat_test <- t.test(unetete_homme$ Tr_dif, mu = 0)
@@ -217,6 +249,11 @@ donnees_sans_na <- na.omit(unetete_homme$Tr_dif)
 densite <- density(donnees_sans_na)
 plot(densite, col = "blue", lwd = 3, main = "Densités de Tr_dif pour les ventes à une tête (hommes)")
 legend("topright", legend = c("Tr_dif"), col = c("blue"), lwd = 3, bty = "n")
+
+
+##########
+
+
 
 # 8) Par genre 
 table(donnees $ b_sexe)
@@ -239,6 +276,7 @@ plot(densite_homme_seller, col = "green", lwd = 3, main = "Densités Td_clone et
 lines(densite_homme_clone, col = "purple", lwd = 3)
 legend("topright", legend = c("Td_seller", "Td_clone"), col = c("green", "purple"), lwd = 3, bty = "n")
 
+
 # Stat des sur Tr_dif par genre 
 ## femmes 
 summary(femmes $ Tr_dif)
@@ -256,6 +294,11 @@ densite2 <- density(donnees_sans_na2)
 plot(densite1, col = "orange", lwd = 3, main = "Densités de Tr_dif pour les femmes et les hommes")
 lines(densite2, col = "cyan", lwd = 3)
 legend("topright", legend = c("Tr_dif femme","Tr_dif homme") , col = c("orange","cyan"), lwd = 3, bty = "n")
+
+
+##########
+
+
 
 # 9) Stat des sur Tr_dif par période de naissance
 summary(donnees $ b_annee)
@@ -288,6 +331,11 @@ lines(densite2, col = "cyan", lwd = 3)
 lines(densite3, col = "green", lwd = 3)
 lines(densite4, col = "purple", lwd = 3)
 legend("topright", legend = c("Tr_dif<1910","1910<Tr_dif<=1919","1919<Tr_dif<=1923", "Tr_dif>1923") , col = c("orange","cyan", "green", "purple"), lwd = 3, bty = "n")
+
+
+##########
+
+
 
 # 11) Par tranche d'âge à la signature du contrat 
 donnees $ Ts <- ifelse(donnees$groupe == "seller", donnees $ Ts_seller, donnees $ Ts_clone)
@@ -326,6 +374,11 @@ lines(densite3, col = "green", lwd = 3)
 lines(densite4, col = "magenta", lwd = 3)
 legend("topright", legend = c("Ts<= 25401","Ts <= 26907 & Ts > 25401","Ts <= 26907 & Ts > 25401", "Ts> 28455") , col = c("red","blue", "green", "magenta"), lwd = 3, bty = "n")
 
+
+##########
+
+
+
 # 12) Par région en France métropolitaine 
 ile_france <- subset(donnees, old_b_dep %in% c(75, 78, 91, 92, 93, 94, 95))
 reste_france_metropolitaine <- subset(donnees, !(old_b_dep %in% c(75, 78, 91, 92, 93, 94, 95)))
@@ -354,15 +407,29 @@ lines(densite2, col = "red", lwd = 3)
 lines(densite3, col = "grey", lwd = 3)
 legend("topright", legend = c("Île-de-France","Reste de la France métropolitaine","Étranger") , col = c("black","red", "grey"), lwd = 3, bty = "n")
 
+
+##########
+
+
+
 # 13) Par tranche de bouquet 
 summary(vendeurs $ downp)
+
+
+##########
+
+
 
 # 14) Par tranche de rente 
 summary(vendeurs $ annuity)
 
+
+##########
+
+
+
 # 15) Régression par MCO de Td^{seller} sur sexe 
 
-## Cas de la régression linéaire simple : 
 ## Je commence par créer la variable adéquat étant donné que nous voulons que sexe 
 ## prenne 0 ou 1. Ici 0 est pour les hommes, 1 pour les femmes. 
 
@@ -399,7 +466,7 @@ ggplot(vendeurs, aes(x = b_sexe, y = Td_predites)) +
 
 
 
-######################### Estimation non paramétrique, cdfDT #########################
+######################### II - Estimation non paramétrique, cdfDT #########################
 clones <- clones[order(clones$jd, clones$index), ]
 
 # Test d'indépendance entre les vars de troncature de duree 
@@ -574,4 +641,170 @@ ggplot(data = estimsexe, aes(x = time, y = survival)) +
   ggtitle("Estimation des survies des vendeurs et clones selon le sexe (avec 95% IC)") +
   xlab("Jours") + ylab("Fonction de survie")
 
-#########################
+################################################################################################### 
+
+
+
+
+################################# Modélisation de la survie ################################# 
+
+clones.list <- split.data.frame(clones, clones$jd)
+
+tirage <- function(data, nb.obs) {
+  echantillon <-  sample(1:nrow(data), size = nb.obs, replace = FALSE)
+  data <- data[echantillon,]
+  return(data)
+}
+
+clones.list <- lapply(clones.list, tirage, nb.obs = 3)
+clones <- do.call(rbind, clones.list)
+
+rm(clones.list, tirage)
+
+
+vendeurs$statuts <- 1
+clones$statuts <- 1
+
+# 1) Estimation sans bouquet et rente
+vendeurs2 <- data.frame(numbase = 1:nrow(vendeurs),  
+                        time = vendeurs$Td, 
+                        ltrunc = vendeurs$ltrunc,
+                        rtrunc = vendeurs$rtrunc, 
+                        sexe_homme = as.numeric(vendeurs$b_sexe == 1),
+                        ile2france = as.numeric(vendeurs$b_dep%in% c(75,78,91,92,93,94,95)),
+                        b_min_Q1 = as.numeric(vendeurs$b_annee %in% c(1891:1910)), #Min-Q1
+                        b_Q1_median = as.numeric(vendeurs$b_annee %in% c(1911:1916)), #Q1-Median
+                        b_median_Q3 = as.numeric(vendeurs$b_annee %in% c(1916:1922)), #Median-Q3
+                        b_Q3_max = as.numeric(vendeurs$b_annee %in% c(1923:1940)),#Q3-Max
+                        oneheadcontr = as.numeric(vendeurs$nb_tete==1),
+                        #age_sign_vieux = as.numeric(vendeurs$cat_age_sign == "Vieux"),
+                        bouquet = vendeurs$downp,
+                        rente = vendeurs$annuity,
+                        status = vendeurs$statuts)
+
+
+
+clones2 <- data.frame(numbase = 1:nrow(clones),
+                      time = clones$Td_clone, 
+                      ltrunc = clones$ltrunc,
+                      rtrunc = clones$rtrunc, 
+                      sexe_homme = as.numeric(clones$b_sexe == 1),
+                      ile2france = as.numeric(clones$old_b_dep%in% c(75,78,91,92,93,94,95)),
+                      b_min_Q1 = as.numeric(clones$b_annee %in% c(1891:1910)), #Min-Q1
+                      b_Q1_median = as.numeric(clones$b_annee %in% c(1911:1916)), #Q1-Median
+                      b_median_Q3 = as.numeric(clones$b_annee %in% c(1916:1922)), #Median-Q3
+                      b_Q3_max = as.numeric(clones$b_annee %in% c(1923:1940)),#Q3-Max
+                      #age_sign_vieux = as.numeric(clones$cat_age_sign == "Vieux"),
+                      status = clones$statuts)
+
+my.formula <- Surv(time, status) ~ sexe_homme + ile2france + b_min_Q1 + 
+  b_Q1_median + b_median_Q3 + b_Q3_max #+ age_sign_vieux
+
+
+# Utilisation de coxDT()
+model.vend <- coxDT(my.formula, L = ltrunc, R = rtrunc, data = vendeurs2)
+model.clone <- coxDT(my.formula, L = ltrunc, R = rtrunc, data = clones2)
+
+haz.ratio.vend <- round(exp(as.numeric(model.vend$results.beta[,1])), digits = 3)
+haz.ratio.clone <- round(exp(as.numeric(model.clone$results.beta[,1])), digits = 3)
+
+varnames <- rownames(model.vend$results.beta)
+estim.names <- c("Haz.ratio", colnames(model.vend$results.beta))
+estim.names[c(2,3,6)] <- c("beta", "se.beta", "Wald stat") 
+
+resultats.vend <- matrix(c(haz.ratio.vend, as.numeric(model.vend$results.beta)), 
+                         nrow = length(varnames), dimnames = list(varnames, estim.names))
+resultats.vend[is.na(resultats.vend)] <- 0.000
+
+resultats.clone <- matrix(c(haz.ratio.clone, as.numeric(model.clone$results.beta)), 
+                          nrow = length(varnames), dimnames = list(varnames, estim.names))
+resultats.clone[is.na(resultats.clone)] <- 0.000
+
+resultats.vend
+resultats.clone
+
+## Afficher les résultats 
+hazard_ratios1 <- resultats.clone[, "Haz.ratio"]
+
+barplot(hazard_ratios1, horiz = FALSE, col = "orange", main = "Hazard Ratios",
+        ylab = "Hazard Ratio", ylim = c(0, max(hazard_ratios1) * 1.2))
+text(x = hazard_ratios1*1.1, labels = names(hazard_ratios1))
+
+hazard_ratios2 <- resultats.vend[, "Haz.ratio"]
+
+barplot(hazard_ratios2, horiz = FALSE, col = "lightblue", main = "Hazard Ratios",
+        ylab = "Hazard Ratio", ylim = c(0, max(hazard_ratios2) * 1.2))
+text(x = hazard_ratios2*1.1, labels = names(hazard_ratios2))
+
+#########
+
+# 2) Estimations avec bouquet et rente
+sum(is.na(vendeurs2$bouquet))
+sum(is.na(vendeurs2$rente))
+
+# Comme nous allons utiliser le log, il nous faut retirer les 0 du dataset 
+new_vendeurs <- subset(vendeurs2, (rente != 0)&(bouquet != 0))
+
+my.formula2 <- Surv(time, status) ~ sexe_homme + ile2france + b_min_Q1 + 
+  b_Q1_median + b_median_Q3 + b_Q3_max + oneheadcontr + 
+  log(bouquet) + log(rente)
+
+model.vend2 <- coxDT(my.formula2, L = ltrunc, R = rtrunc, 
+                     data = new_vendeurs)
+
+haz.ratio.vend2 <- round(exp(as.numeric(model.vend2$results.beta[,1])), digits = 3)
+
+varnames2 <- rownames(model.vend2$results.beta)
+
+resultats.vend2 <- matrix(c(haz.ratio.vend2, as.numeric(model.vend2$results.beta)), 
+                          nrow = length(varnames2), dimnames = list(varnames2, estim.names))
+resultats.vend2[is.na(resultats.vend2)] <- 0.000
+
+resultats.vend2
+
+## Afficher les résultats 
+hazard_ratios <- resultats.vend2[, "Haz.ratio"]
+
+barplot(hazard_ratios, horiz = FALSE, col = "lightblue", main = "Hazard Ratios",
+        ylab = "Hazard Ratio", ylim = c(0, max(hazard_ratios) * 1.2))
+text(x = hazard_ratios*1.1, labels = names(hazard_ratios))
+
+
+
+##### Modèle de fragilté 
+
+
+vendeurs2 <- na.omit(vendeurs2[order(vendeurs2$ltrunc,vendeurs2$time), ])
+
+mph.vend <- emfrail(formula = Surv(ltrunc, time, status) ~ sexe_homme + 
+                      ile2france + b_min_Q1 + 
+                      b_Q1_median + b_median_Q3 + b_Q3_max + 
+                      cluster(numbase), 
+                    data = subset(vendeurs2, time > ltrunc), 
+                    distribution = emfrail_dist (dist = "gamma",
+                                                 left_truncation = TRUE, 
+                                                 basehaz = "exponential")) 
+
+
+mph.clone <- emfrail(formula = Surv(ltrunc, time, status==1) ~ sexe_homme + 
+                       ile2france + b_min_Q1 + 
+                       b_Q1_median + b_median_Q3 + b_Q3_max + cluster (numbase), 
+                     data = subset(clones2, time > ltrunc), 
+                     distribution = emfrail_dist (dist = "gamma",
+                                                  left_truncation = TRUE, 
+                                                  basehaz = "exponential")) 
+
+# Avec bouquet et rente
+mph.vend2 <- emfrail(formula = Surv(ltrunc, time, status==1) ~ sexe_homme + 
+                       ile2france + b_min_Q1 + 
+                       b_Q1_median + b_median_Q3 + b_Q3_max + log(bouquet) + log(rente) + cluster(numbase), 
+                     data = subset(new_vendeurs, 
+                                   (time > ltrunc)&(!is.na(bouquet))&(!is.na(rente))&(rente != 0)), 
+                     distribution = emfrail_dist (dist = "gamma",
+                                                  left_truncation = TRUE, 
+                                                  basehaz = "exponential")) 
+
+
+
+
+################################################################################################### 
