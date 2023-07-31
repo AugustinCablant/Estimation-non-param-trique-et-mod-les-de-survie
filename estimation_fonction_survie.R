@@ -851,8 +851,6 @@ vendeurs2 <- data.frame(numbase = 1:nrow(vendeurs),
                         rente = vendeurs$annuity,
                         status = vendeurs$statuts)
 
-
-
 clones2 <- data.frame(numbase = 1:nrow(clones),
                       time = clones$Td_clone, 
                       ltrunc = clones$ltrunc,
@@ -912,6 +910,7 @@ sum(is.na(vendeurs2$bouquet))
 sum(is.na(vendeurs2$rente))
 
 # Comme nous allons utiliser le log, il nous faut retirer les 0 du dataset 
+
 new_vendeurs <- subset(vendeurs2, (rente != 0)&(bouquet != 0))
 
 my.formula2 <- Surv(time, status) ~ sexe_homme + ile2france + b_min_Q1 + 
@@ -941,39 +940,71 @@ text(x = hazard_ratios*1.1, labels = names(hazard_ratios))
 
 
 ##### Modèle de fragilté 
+vendeurs2 <- na.omit(vendeurs2)
 
+vendeurs2 <- vendeurs2[order(vendeurs2$time), ]
 
-vendeurs2 <- na.omit(vendeurs2[order(vendeurs2$ltrunc,vendeurs2$time), ])
-
-mph.vend <- emfrail(formula = Surv(ltrunc, time, status) ~ sexe_homme + 
+mph.vend <- emfrail(formula = Surv(time, status) ~ sexe_homme + 
                       ile2france + b_min_Q1 + 
                       b_Q1_median + b_median_Q3 + b_Q3_max + 
                       cluster(numbase), 
-                    data = subset(vendeurs2, time > ltrunc), 
-                    distribution = emfrail_dist (dist = "gamma",
+                    data = subset(vendeurs2), 
+                    distribution = emfrail_dist(dist = "gamma",
                                                  left_truncation = TRUE, 
                                                  basehaz = "exponential")) 
 
+# plot this 
+fr_var <- seq(from = 0.01, to = 1.4, length.out = 20)
+# For gamma the variance is 1/theta (see parametrizations)
+pll_gamma <- emfrail_pll(formula = Surv(time, status) ~ sexe_homme + 
+                           ile2france + b_min_Q1 + 
+                           b_Q1_median + b_median_Q3 + b_Q3_max + 
+                           cluster(numbase),
+                         data = vendeurs2,
+                         values = 1/fr_var )
+plot(fr_var, pll_gamma,
+     type = "l",
+     xlab = "Frailty variance",
+     ylab = "Profile log-likelihood")
 
-mph.clone <- emfrail(formula = Surv(ltrunc, time, status==1) ~ sexe_homme + 
+
+#########
+clones2 <- na.omit(clones2)
+
+clones2 <- clones2[order(clones2$time), ]
+
+mph.clone <- emfrail(formula = Surv(time, status==1) ~ sexe_homme + 
                        ile2france + b_min_Q1 + 
                        b_Q1_median + b_median_Q3 + b_Q3_max + cluster (numbase), 
                      data = subset(clones2, time > ltrunc), 
                      distribution = emfrail_dist (dist = "gamma",
                                                   left_truncation = TRUE, 
                                                   basehaz = "exponential")) 
+mph.clone
+
 
 # Avec bouquet et rente
-mph.vend2 <- emfrail(formula = Surv(ltrunc, time, status==1) ~ sexe_homme + 
+vendeurs3 <- subset(vendeurs2, (rente != 0)&(bouquet != 0))
+any(is.na(vendeurs3$bouquet))
+any(vendeurs3$bouquet == 0)
+
+any(is.na(vendeurs3$rente))
+any(vendeurs3$rente == 0)
+
+
+vendeurs3 <- na.omit(vendeurs3)
+vendeurs3 <- vendeurs3[order(vendeurs3$time), ]
+
+mph.vend2 <- emfrail(formula = Surv(time, status) ~ sexe_homme + 
                        ile2france + b_min_Q1 + 
                        b_Q1_median + b_median_Q3 + b_Q3_max + log(bouquet) + log(rente) + cluster(numbase), 
-                     data = subset(new_vendeurs, 
-                                   (time > ltrunc)&(!is.na(bouquet))&(!is.na(rente))&(rente != 0)), 
+                     data = vendeurs3,  
                      distribution = emfrail_dist (dist = "gamma",
                                                   left_truncation = TRUE, 
                                                   basehaz = "exponential")) 
+mph.vend2
 
 
 
-
+rm(list = ls())
 ################################################################################################### 
