@@ -147,6 +147,7 @@ axis(side = 2, c(-2.2, 1.7), lwd = 3.5, labels = c("",""), lwd.ticks = -1)
 ######## Quelques stat des demandées par Mr Visser (numérotées comme ds le overleaf)
 
 # 1) Stat des sur Tr 
+vendeurs $ Tr_seller = vendeurs $ Tr
 summary(vendeurs $ Tr_seller)
 summary(clones $ Tr_clone)
 hist(vendeurs $ Tr_seller, main = "Histogramme de la durée de vie résiduelle des vendeurs", freq = FALSE, xlab = "",
@@ -162,7 +163,6 @@ lines(densite_clone, col = "cyan", lwd = 3)
 legend("topright", legend = c("Tr_seller", "Tr_clone"), col = c("cyan", "brown"), lwd = 3, bty = "n")
 
 
-##########
 
 
 # 2) Stat def sur Tr_dif
