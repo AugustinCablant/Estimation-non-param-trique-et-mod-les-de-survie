@@ -9,12 +9,16 @@
 #install.packages("gridExtra")
 
 library(survival)
+library(dplyr)
 library(SurvTrunc)
 library(ggplot2)
+library(stats)
 library(progress)
 library(frailtyEM)
 library(glm2)
 library(gridExtra)
+
+
 #library(survminer)
 
 
@@ -146,8 +150,20 @@ axis(side = 2, c(-2.2, 1.7), lwd = 3.5, labels = c("",""), lwd.ticks = -1)
 
 
 ######## Quelques stat des demandées par Mr Visser (numérotées comme ds le overleaf)
+### Faire les stats pour un clone tiré aléatoirement 
+tirage <- function(data, nb.obs) {
+  echantillon <-  sample(1:nrow(data), size = nb.obs, replace = FALSE)
+  data <- data[echantillon,]
+  return(data)
+}
+clones.list <- split.data.frame(clones, clones$jd)
+clones.list <- lapply(clones.list, tirage, nb.obs = 1)
+sample_clone = do.call(rbind,clones.list)
+
+clones = sample_clone
 
 # 1) Stat des sur Tr 
+vendeurs $ Tr_seller = vendeurs $ Tr
 summary(vendeurs $ Tr_seller)
 summary(clones $ Tr_clone)
 hist(vendeurs $ Tr_seller, main = "Histogramme de la durée de vie résiduelle des vendeurs", freq = FALSE, xlab = "",
@@ -162,26 +178,27 @@ plot(densite_seller, col = "brown", lwd = 3, main = "Densités de Tr_seller et T
 lines(densite_clone, col = "cyan", lwd = 3)
 legend("topright", legend = c("Tr_seller", "Tr_clone"), col = c("cyan", "brown"), lwd = 3, bty = "n")
 
+##########
 
 ##########
 
 
 # 2) Stat def sur Tr_dif
-summary(donnees $ Tr_dif)
-resultat_test <- t.test(donnees$ Tr_dif, mu = 0)
+
+summary(clones $ Tr_dif)
+resultat_test <- t.test(clones$ Tr_dif, mu = 0)
 print(resultat_test)
-donnees_sans_na <- na.omit(donnees$Tr_dif)
+donnees_sans_na <- na.omit(clones$Tr_dif)
 densite <- density(donnees_sans_na)
-plot(densite, col = "lightblue", lwd = 3, main = "Densités de Tr_dif")
+plot(densite, col = "lightblue", lwd = 3, main = "Densités de Tr_dif chez les clones")
 legend("topright", legend = c("Tr_dif"), col = c("lightblue"), lwd = 3, bty = "n")
 
-
 ######## Distinction sur les têtes 
-unetete <- donnees[donnees$nb_tete == 1, ]
+unetete <- clones[clones$nb_tete == 1, ]
 unetete_femme <- unetete[unetete$b_sexe == 2, ]
 unetete_homme <- unetete[unetete$b_sexe == 1, ]
 
-deuxtete <- donnees[donnees$nb_tete == 2, ]
+deuxtete <- clones[clones$nb_tete == 2, ]
 deuxtete_tete1 <- deuxtete[deuxtete$head == 1, ]
 deuxtete_tete2 <- deuxtete[deuxtete$head == 2, ]
 
@@ -224,10 +241,7 @@ densite <- density(donnees_sans_na)
 plot(densite, col = "cyan", lwd = 3, main = "Densités de Tr_dif pour la tete 2 des ventes à deux têtes ")
 legend("topright", legend = c("Tr_dif"), col = c("cyan"), lwd = 3, bty = "n")
 
-
 ##########
-
-
 
 # 6) Stat des sur Tr_dif sur les ventes à une tête femme
 summary(unetete_femme $ Tr_dif)
@@ -237,7 +251,6 @@ donnees_sans_na <- na.omit(unetete_femme$Tr_dif)
 densite <- density(donnees_sans_na)
 plot(densite, col = "red", lwd = 3, main = "Densités de Tr_dif pour les ventes à une tête (femmes")
 legend("topright", legend = c("Tr_dif"), col = c("red"), lwd = 3, bty = "n")
-
 
 ##########
 
@@ -257,42 +270,47 @@ legend("topright", legend = c("Tr_dif"), col = c("blue"), lwd = 3, bty = "n")
 
 
 # 8) Par genre 
-table(donnees $ b_sexe)
+clones_femme = clones[clones$b_sexe == 2,]
+clones_homme = clones[clones$b_sexe == 1,]
+vendeurs_homme = vendeurs[vendeurs$b_sexe==1,]
+vendeurs_femme = vendeurs[vendeurs$b_sexe==1,]
 
-densite_femme_sans_na <- na.omit(femmes $ Td_seller)
+
+densite_femme_sans_na <- na.omit(vendeurs_femme $ Td)
 densite_femme_seller <- density(densite_femme_sans_na)
-densite_femme_sans_na2 <- na.omit(femmes $ Td_clone)
+densite_femme_sans_na2 <- na.omit(clones_femme $ Td_clone)
 densite_femme_clone <- density(densite_femme_sans_na2)
 
 plot(densite_femme_seller, col = "orange", lwd = 3, main = "Densités Td_clone et Td_seller chez les femmes")
 lines(densite_femme_clone, col = "cyan", lwd = 3)
 legend("topright", legend = c("Td_seller", "Td_clone"), col = c("orange", "cyan"), lwd = 3, bty = "n")
 
-densite_homme_sans_na <- na.omit(hommes $ Td_seller)
+densite_homme_sans_na <- na.omit(vendeurs_homme $ Td)
 densite_homme_seller <- density(densite_homme_sans_na)
-densite_homme_sans_na2 <- na.omit(hommes $ Td_clone)
+densite_homme_sans_na2 <- na.omit(clones_homme $ Td_clone)
 densite_homme_clone <- density(densite_homme_sans_na2)
 
-plot(densite_homme_seller, col = "green", lwd = 3, main = "Densités Td_clone et Td_seller chez les femmes")
+plot(densite_homme_seller, col = "green", lwd = 3, main = "Densités Td_clone et Td_seller chez les hommes")
 lines(densite_homme_clone, col = "purple", lwd = 3)
 legend("topright", legend = c("Td_seller", "Td_clone"), col = c("green", "purple"), lwd = 3, bty = "n")
 
 
 # Stat des sur Tr_dif par genre 
 ## femmes 
-summary(femmes $ Tr_dif)
+summary(clones_femme $ Tr_dif)
 resultat_test <- t.test(femmes$ Tr_dif, mu = 0)
 print(resultat_test)
 ## hommes 
-summary(hommes $ Tr_dif)
+summary(clones_homme $ Tr_dif)
 resultat_test <- t.test(hommes$ Tr_dif, mu = 0)
 print(resultat_test)
 
-donnees_sans_na1 <- na.omit(femmes$Tr_dif)
+donnees_sans_na1 <- na.omit(clones_femme$Tr_dif)
 densite1 <- density(donnees_sans_na1)
-donnees_sans_na2 <- na.omit(hommes$Tr_dif)
+donnees_sans_na2 <- na.omit(clones_homme$Tr_dif)
 densite2 <- density(donnees_sans_na2)
-plot(densite1, col = "orange", lwd = 3, main = "Densités de Tr_dif pour les femmes et les hommes")
+max_density <- max(densite1$y, densite2$y)
+plot(densite1, col = "orange", lwd = 3, main = "Densités de Tr_dif pour les femmes et les hommes", ylim = c(0, max_density))
 lines(densite2, col = "cyan", lwd = 3)
 legend("topright", legend = c("Tr_dif femme","Tr_dif homme") , col = c("orange","cyan"), lwd = 3, bty = "n")
 
@@ -302,36 +320,53 @@ legend("topright", legend = c("Tr_dif femme","Tr_dif homme") , col = c("orange",
 
 
 # 9) Stat des sur Tr_dif par période de naissance
-summary(donnees $ b_annee)
+donnees <- bind_rows(vendeurs,clones)
+
+summary(vendeurs $ b_annee)
 periode1 <- subset(donnees, b_annee <= 1910)
-periode2 <- subset(donnees, b_annee <= 1919 & b_annee > 1910)
-periode3 <- subset(donnees, b_annee <= 1923 & b_annee > 1919)
-periode4 <- subset(donnees, b_annee > 1923)
+periode2 <- subset(donnees, b_annee <= 1916 & b_annee > 1910)
+periode3 <- subset(donnees, b_annee <= 1922 & b_annee > 1916)
+periode4 <- subset(donnees, b_annee > 1922)
+
+periode1_filtered <- subset(periode1, Tr_dif != 0)
+periode2_filtered <- subset(periode2, Tr_dif != 0)
+periode3_filtered <- subset(periode3, Tr_dif != 0)
+periode4_filtered <- subset(periode4, Tr_dif != 0)
 
 test1 <- t.test(periode1 $ Tr_dif, mu = 0)
 test2 <- t.test(periode2 $ Tr_dif, mu = 0)
 test3 <- t.test(periode3 $ Tr_dif, mu = 0)
 test4 <- t.test(periode4 $ Tr_dif, mu = 0)
 
+test11 <- t.test(periode1_filtered $ Tr_dif, mu = 0)
+test22 <- t.test(periode2_filtered $ Tr_dif, mu = 0)
+test33 <- t.test(periode3_filtered $ Tr_dif, mu = 0)
+test44 <- t.test(periode4_filtered $ Tr_dif, mu = 0)
+
 print(test1) 
 print(test2) 
 print(test3) 
 print(test4) 
+print(test11) 
+print(test22) 
+print(test33) 
+print(test44)
 
-donnees_sans_na1 <- na.omit(periode1$Tr_dif)
+donnees_sans_na1 <- na.omit(periode1_filtered$Tr_dif)
 densite1 <- density(donnees_sans_na1)
-donnees_sans_na2 <- na.omit(periode2$Tr_dif)
+donnees_sans_na2 <- na.omit(periode2_filtered$Tr_dif)
 densite2 <- density(donnees_sans_na2)
-donnees_sans_na3 <- na.omit(periode3$Tr_dif)
+donnees_sans_na3 <- na.omit(periode3_filtered$Tr_dif)
 densite3 <- density(donnees_sans_na3)
-donnees_sans_na4 <- na.omit(periode4$Tr_dif)
+donnees_sans_na4 <- na.omit(periode4_filtered$Tr_dif)
 densite4 <- density(donnees_sans_na4)
 
 plot(densite1, col = "orange", lwd = 3, main = "Densités de Tr_dif selon les périodes")
 lines(densite2, col = "cyan", lwd = 3)
 lines(densite3, col = "green", lwd = 3)
 lines(densite4, col = "purple", lwd = 3)
-legend("topright", legend = c("Tr_dif<1910","1910<Tr_dif<=1919","1919<Tr_dif<=1923", "Tr_dif>1923") , col = c("orange","cyan", "green", "purple"), lwd = 3, bty = "n")
+legend("topright", legend = c("année naissance<1910","1910<année naissance<=1919",
+                              "1919<année naissance<=1923", "année naissance>1923") , col = c("orange","cyan", "green", "purple"), lwd = 3, bty = "n")
 
 
 ##########
@@ -339,7 +374,7 @@ legend("topright", legend = c("Tr_dif<1910","1910<Tr_dif<=1919","1919<Tr_dif<=19
 
 
 # 11) Par tranche d'âge à la signature du contrat 
-donnees $ Ts <- ifelse(donnees$groupe == "seller", donnees $ Ts_seller, donnees $ Ts_clone)
+donnees $ Ts <- ifelse(donnees$groupe == "seller", donnees $ Ts, donnees $ Ts_clone)
 donnees $ Ts_age <- round((donnees $ Ts)/365)
 summary(donnees $ Ts)
 summary(donnees $ Ts_age)
@@ -349,27 +384,42 @@ ts2 <- subset(donnees, Ts <= 26907 & Ts > 25401)
 ts3 <- subset(donnees, Ts <= 28455 & Ts > 26907)
 ts4 <- subset(donnees, Ts> 28455)
 
+ts1_filtered <- subset(ts1, Tr_dif != 0)
+ts2_filtered <- subset(ts2, Tr_dif != 0)
+ts3_filtered <- subset(ts3, Tr_dif != 0)
+ts4_filtered <- subset(ts4, Tr_dif != 0)
+
 test1 <- t.test(ts1 $ Tr_dif, mu = 0)
 test2 <- t.test(ts2 $ Tr_dif, mu = 0)
 test3 <- t.test(ts3 $ Tr_dif, mu = 0)
 test4 <- t.test(ts4 $ Tr_dif, mu = 0)
+test11 <- t.test(ts1_filtered $ Tr_dif, mu = 0)
+test22 <- t.test(ts2_filtered $ Tr_dif, mu = 0)
+test33 <- t.test(ts3_filtered $ Tr_dif, mu = 0)
+test44 <- t.test(ts4_filtered $ Tr_dif, mu = 0)
 
 print(test1) 
 print(test2) 
 print(test3) 
-print(test4) 
+print(test4)
+print(test11) 
+print(test22) 
+print(test33) 
+print(test44) 
 
-donnees_sans_na1 <- na.omit(ts1$Tr_dif)
+donnees_sans_na1 <- na.omit(ts1_filtered$Tr_dif)
 densite1 <- density(donnees_sans_na1)
-donnees_sans_na2 <- na.omit(ts2$Tr_dif)
+donnees_sans_na2 <- na.omit(ts2_filtered$Tr_dif)
 densite2 <- density(donnees_sans_na2)
-donnees_sans_na3 <- na.omit(ts3$Tr_dif)
+donnees_sans_na3 <- na.omit(ts3_filtered$Tr_dif)
 densite3 <- density(donnees_sans_na3)
-donnees_sans_na4 <- na.omit(ts4$Tr_dif)
+donnees_sans_na4 <- na.omit(ts4_filtered$Tr_dif)
 densite4 <- density(donnees_sans_na4)
 
+max_density <- max(densite1$y, densite2$y, densite3$y, densite4$y)
+
 par(ask = FALSE, mar = c(5, 5, 4, 2) + 0.2)
-plot(densite1, col = "red", lwd = 3, main = "Densités de Tr_dif selon l'âge du vendeur au moment de la signature du contrat", ylim = c(0, 0.00015))
+plot(densite1, col = "red", lwd = 3, main = "Densités de Tr_dif selon l'âge du vendeur au moment de la signature du contrat", ylim = c(0, max_density))
 lines(densite2, col = "blue", lwd = 3)
 lines(densite3, col = "green", lwd = 3)
 lines(densite4, col = "magenta", lwd = 3)
@@ -385,21 +435,31 @@ ile_france <- subset(donnees, old_b_dep %in% c(75, 78, 91, 92, 93, 94, 95))
 reste_france_metropolitaine <- subset(donnees, !(old_b_dep %in% c(75, 78, 91, 92, 93, 94, 95)))
 etranger <- subset(donnees, old_b_dep==99)
 
+ile_france_filtered <- subset(ile_france, Tr_dif != 0)
+reste_france_metropolitaine_filtered <- subset(reste_france_metropolitaine, Tr_dif != 0)
+etranger_filtered <- subset(etranger, Tr_dif != 0)
+
 test1 <- t.test(ile_france $ Tr_dif, mu = 0)
 test2 <- t.test(reste_france_metropolitaine $ Tr_dif, mu = 0)
 test3 <- t.test(etranger $ Tr_dif, mu = 0)
+test11 <- t.test(ile_france_filtered $ Tr_dif, mu = 0)
+test22 <- t.test(reste_france_metropolitaine_filtered $ Tr_dif, mu = 0)
+test33 <- t.test(etranger_filtered $ Tr_dif, mu = 0)
 
 
 print(test1) 
 print(test2) 
 print(test3) 
+print(test11) 
+print(test22) 
+print(test33)
 
 
-donnees_sans_na1 <- na.omit(ile_france$Tr_dif)
+donnees_sans_na1 <- na.omit(ile_france_filtered$Tr_dif)
 densite1 <- density(donnees_sans_na1)
-donnees_sans_na2 <- na.omit(reste_france_metropolitaine$Tr_dif)
+donnees_sans_na2 <- na.omit(reste_france_metropolitaine_filtered$Tr_dif)
 densite2 <- density(donnees_sans_na2)
-donnees_sans_na3 <- na.omit(etranger$Tr_dif)
+donnees_sans_na3 <- na.omit(etranger_filtered$Tr_dif)
 densite3 <- density(donnees_sans_na3)
 
 
@@ -416,6 +476,50 @@ legend("topright", legend = c("Île-de-France","Reste de la France métropolitai
 # 13) Par tranche de bouquet 
 summary(vendeurs $ downp)
 
+liste_jd <- unique(donnees[donnees$groupe == 'seller', 'jd'])
+
+for (j in liste_jd) {
+  sub_df = vendeurs[vendeurs$jd==j,]
+  bouquet = sub_df$downp
+  rente = sub_df$annuity
+  clones[clones$jd==j, "downp"] = bouquet
+  clones[clones$jd==j, "annuity"] = rente
+}
+
+bouquet1 = subset(clones, downp <= 10671)
+bouquet2 = subset(clones, downp <= 27441 & downp > 10671)
+bouquet3 = subset(clones, downp <= 59455 & downp > 27441)
+bouquet4 = subset(clones, downp > 59455)
+
+test1 <- t.test(bouquet1 $ Tr_dif, mu = 0)
+test2 <- t.test(bouquet2 $ Tr_dif, mu = 0)
+test3 <- t.test(bouquet3 $ Tr_dif, mu = 0)
+test3 <- t.test(bouquet4 $ Tr_dif, mu = 0)
+
+print(test1)
+print(test2)
+print(test3)
+print(test4)
+
+
+donnees_sans_na1 <- na.omit(bouquet1$Tr_dif)
+densite1 <- density(donnees_sans_na1)
+donnees_sans_na2 <- na.omit(bouquet2$Tr_dif)
+densite2 <- density(donnees_sans_na2)
+donnees_sans_na3 <- na.omit(bouquet3$Tr_dif)
+densite3 <- density(donnees_sans_na3)
+donnees_sans_na4 <- na.omit(bouquet4$Tr_dif)
+densite4 <- density(donnees_sans_na4)
+
+max_density <- max(densite1$y, densite2$y, densite3$y, densite4$y)
+
+par(ask = FALSE, mar = c(5, 5, 4, 2) + 0.2)
+plot(densite1, col = "cyan", lwd = 3, main = "Densités de Tr_dif selon le bouquet", ylim = c(0, max_density))
+lines(densite2, col = "green", lwd = 3)
+lines(densite3, col = "grey", lwd = 3)
+lines(densite4, col = "black", lwd = 3)
+legend("topright", legend = c("bouquet<= 10671€"," 10671€<bouquet<=27441€","27441€<bouquet<=59455€", "bouquet> 59455€") , col = c("cyan","green", "grey", "black"), lwd = 3, bty = "n")
+
 
 ##########
 
@@ -423,6 +527,40 @@ summary(vendeurs $ downp)
 
 # 14) Par tranche de rente 
 summary(vendeurs $ annuity)
+
+rente1 = subset(clones, annuity <= 4574)
+rente2 = subset(clones, downp <= 7318 & downp > 4574)
+rente3 = subset(clones, downp <= 12193 & downp > 7318)
+rente4 = subset(clones, downp > 12193)
+
+test1 <- t.test(rente1 $ Tr_dif, mu = 0)
+test2 <- t.test(rente2 $ Tr_dif, mu = 0)
+test3 <- t.test(rente3 $ Tr_dif, mu = 0)
+test3 <- t.test(rente4 $ Tr_dif, mu = 0)
+
+print(test1)
+print(test2)
+print(test3)
+print(test4)
+
+
+donnees_sans_na1 <- na.omit(rente1$Tr_dif)
+densite1 <- density(donnees_sans_na1)
+donnees_sans_na2 <- na.omit(rente2$Tr_dif)
+densite2 <- density(donnees_sans_na2)
+donnees_sans_na3 <- na.omit(rente3$Tr_dif)
+densite3 <- density(donnees_sans_na3)
+donnees_sans_na4 <- na.omit(rente4$Tr_dif)
+densite4 <- density(donnees_sans_na4)
+
+max_density <- max(densite1$y, densite2$y, densite3$y, densite4$y)
+
+par(ask = FALSE, mar = c(5, 5, 4, 2) + 0.2)
+plot(densite1, col = "yellow", lwd = 3, main = "Densités de Tr_dif selon la rente", ylim = c(0, max_density))
+lines(densite2, col = "orange", lwd = 3)
+lines(densite3, col = "red", lwd = 3)
+lines(densite4, col = "purple", lwd = 3)
+legend("topright", legend = c("rente<= 4574€"," 4574€<rente<=7318€","7318€<rente<=12193€", "rente> 12193€") , col = c("yellow","orange", "red", "purple"), lwd = 3, bty = "n")
 
 
 ##########
@@ -491,19 +629,6 @@ p6 <- ggplot(data = vendeurs_MCO, aes(x = bouquet, y = Td)) +
 grid.arrange(p1, p2, p3, p4, p5, p6, ncol = 2)
 
 
-
-# Créer un data frame avec les valeurs prédites et les valeurs observées
-predictions <- data.frame(Y_obs = vendeurs_MCO$Td, Y_pred = fitted(modele_regression) )
-
-# Créer le graphique de dispersion avec une ligne de régression ajustée
-ggplot(data = predictions, aes(x = Y_obs, y = Y_pred)) +
-  geom_point() +
-  geom_abline(intercept = 0, slope = 1, color = "blue", linetype = "dashed") +
-  xlab("Valeurs observées de Td") +
-  ylab("Valeurs prédites de Td") +
-  ggtitle("Régression linéaire par mCO de Td sur sexe, region, bouquet, rente, vente à une têtes")
-
-
 ########
 
 
@@ -557,17 +682,6 @@ p6 <- ggplot(data = vendeurs_MCO, aes(x = bouquet, y = Tr)) +
 
 grid.arrange(p1, p2, p3, p4, p5, p6, ncol = 2)
 
-# Créer un data frame avec les valeurs prédites et les valeurs observées
-predictions <- data.frame(Y_obs = vendeurs_MCO$Tr, Y_pred = fitted(modele_regression) )
-
-# Créer le graphique de dispersion avec une ligne de régression ajustée
-ggplot(data = predictions, aes(x = Y_obs, y = Y_pred)) +
-  geom_point() +
-  geom_abline(intercept = 0, slope = 1, color = "blue", linetype = "dashed") +
-  xlab("Valeurs observées de Tr") +
-  ylab("Valeurs prédites de Tr") +
-  ggtitle("Régression linéaire par MCO de Tr sur sexe, region, bouquet, rente, vente à une têtes")
-
 
 ##########
 
@@ -580,7 +694,7 @@ clones_MCO$etranger = as.numeric(clones_MCO$old_b_dep==99)
 clones_MCO$une_tete = as.numeric(clones_MCO$nb_tete==1)
 
 
-modele_regression <- lm(Tr_dif ~ sexe_homme + idf + etranger + une_tete , data = clones_MCO)
+modele_regression <- lm(Tr_dif ~ sexe_homme + idf + etranger + une_tete + downp + annuity , data = clones_MCO)
 summary(modele_regression)
 
 p1 <- ggplot(data = clones_MCO, aes(x = sexe_homme, y = Tr_dif)) +
@@ -611,30 +725,78 @@ p4 <- ggplot(data = clones_MCO, aes(x = une_tete, y = Tr_dif)) +
   ylab("Tr_dif") +
   ggtitle("Régression linéaire : Tr_dif en fonction de une_tete")
 
+p5 <- ggplot(data = clones_MCO, aes(x = downp, y = Tr_dif)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  xlab("une_tete") +
+  ylab("Tr_dif") +
+  ggtitle("Régression linéaire : Tr_dif en fonction de bouquet")
+
+p6 <- ggplot(data = clones_MCO, aes(x = annuity, y = Tr_dif)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  xlab("une_tete") +
+  ylab("Tr_dif") +
+  ggtitle("Régression linéaire : Tr_dif en fonction de rente")
+
 
 
 grid.arrange(p1, p2, p3, p4, p5, p6, ncol = 2)
-
-# Créer un data frame avec les valeurs prédites et les valeurs observées
-predictions <- data.frame(Y_obs = clones_MCO$Tr_dif, Y_pred = fitted(modele_regression) )
-
-# Créer le graphique de dispersion avec une ligne de régression ajustée
-ggplot(data = predictions, aes(x = Y_obs, y = Y_pred)) +
-  geom_point() +
-  geom_abline(intercept = 0, slope = 1, color = "blue", linetype = "dashed") +
-  xlab("Valeurs observées de Tr_dif") +
-  ylab("Valeurs prédites de Tr_dif") +
-  ggtitle("Régression linéaire par MCO de Tr_dif sur sexe, region, vente à une têtes")
 
 #########
 
 # 18) Régression logistique de indicatrice(Tr_dif > 0) sur sexe, region, bouquet, rente, vente à une têtes 
 
+clones_MCO $ indicatrice_Tr = ifelse(clones_MCO$Tr_dif <= 0, 0, 1)
 
+
+modele_regression_logistique <- glm(indicatrice_Tr ~ sexe_homme + idf + etranger + une_tete , data = clones_MCO, family=binomial)
+summary(modele_regression_logistique)
+
+p1 <- ggplot(data = clones_MCO, aes(x = sexe_homme, y = indicatrice_Tr)) +
+  geom_point() +
+  geom_smooth(method = "glm",method.args = list(family = binomial), se = FALSE, color = "blue") +
+  xlab("sexe_homme") +
+  ylab("Indicatrice(Tr_dif>0)") +
+  ggtitle("Régression logistique : Indicatrice(Tr_dif>0) en fonction de sexe_homme")
+
+p2 <- ggplot(data = clones_MCO, aes(x = idf, y = indicatrice_Tr)) +
+  geom_point() +
+  geom_smooth(method = "glm",method.args = list(family = binomial), se = FALSE, color = "blue") +
+  xlab("idf") +
+  ylab("Indicatrice(Tr_dif>0)") +
+  ggtitle("Régression logistique : Indicatrice(Tr_dif>0) en fonction de idf")
+
+p3 <- ggplot(data = clones_MCO, aes(x = etranger, y = indicatrice_Tr)) +
+  geom_point() +
+  geom_smooth(method = "glm",method.args = list(family = binomial), se = FALSE, color = "blue") +
+  xlab("etranger") +
+  ylab("Indicatrice(Tr_dif>0)") +
+  ggtitle("Régression logistique : Indicatrice(Tr_dif>0) en fonction de etranger")
+
+p4 <- ggplot(data = clones_MCO, aes(x = une_tete, y = indicatrice_Tr)) +
+  geom_point() +
+  geom_smooth(method = "glm",method.args = list(family = binomial), se = FALSE, color = "blue") +
+  xlab("une_tete") +
+  ylab("Indicatrice(Tr_dif>0)") +
+  ggtitle("Régression logistique : Indicatrice(Tr_dif>0) en fonction de une_tete")
+
+
+grid.arrange(p1, p2, p3, p4, ncol = 2)
+################################################################################################################################################ 
+################################################################################################################################################ 
 ################################################################################################################################################ 
 
 
 
+
+
+
+
+
+################################################################################################################################################ 
+################################################################################################################################################ 
+################################################################################################################################################ 
 
 ######################### II - Estimation non paramétrique, cdfDT #########################
 clones <- clones[order(clones$jd, clones$index), ]
