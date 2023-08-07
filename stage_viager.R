@@ -83,6 +83,7 @@ vendeurs <- subset(donnees, groupe == "seller")
 clones <- subset(donnees,groupe == "clone")
 
 
+
 #################################### I - Statistiques descriptives #################################### 
 # Nous commençons par une section statistiques descriptives, elles ne sont pas exhaustives
 
@@ -202,6 +203,7 @@ deuxtete <- clones[clones$nb_tete == 2, ]
 deuxtete_tete1 <- deuxtete[deuxtete$head == 1, ]
 deuxtete_tete2 <- deuxtete[deuxtete$head == 2, ]
 
+table(deuxtete_tete2$b_sexe)
 
 ##########
 
@@ -228,6 +230,27 @@ densite <- density(donnees_sans_na)
 plot(densite, col = "magenta", lwd = 3, main = "Densités de Tr_dif pour la tete 1 des ventes à deux têtes ")
 legend("topright", legend = c("Tr_dif"), col = c("magenta"), lwd = 3, bty = "n")
 
+## 4)bis) Stat des sur Tr_dif sur les ventes à deux têtes, focus sur la tête 1, femme / homme
+deuxtete_tete1_femme = deuxtete_tete1[deuxtete_tete1$b_sexe == 2,]
+deuxtete_tete1_homme = deuxtete_tete1[deuxtete_tete1$b_sexe == 1,]
+summary(deuxtete_tete1_femme $ Tr_dif)
+summary(deuxtete_tete1_homme $ Tr_dif)
+
+resultat_test <- t.test(deuxtete_tete1_femme$ Tr_dif, mu = 0)
+print(resultat_test)
+resultat_test2 <- t.test(deuxtete_tete1_homme$ Tr_dif, mu = 0)
+print(resultat_test2)
+
+donnees_sans_na <- na.omit(deuxtete_tete1_femme$Tr_dif)
+densite <- density(donnees_sans_na)
+
+donnees_sans_na2 <- na.omit(deuxtete_tete1_homme$Tr_dif)
+densite2 <- density(donnees_sans_na2)
+
+plot(densite, col = "red", lwd = 3, main = "Densités de Tr_dif pour la tete 1 (homme vs femme) des ventes à deux têtes ")
+lines(densite2, col = "blue", lwd = 3)
+legend("topright", legend = c("Tr_dif femme", 'Tr_dif homme'), col = c("red","blue"), lwd = 3, bty = "n")
+
 
 ##########
 
@@ -240,6 +263,29 @@ donnees_sans_na <- na.omit(deuxtete_tete2$Tr_dif)
 densite <- density(donnees_sans_na)
 plot(densite, col = "cyan", lwd = 3, main = "Densités de Tr_dif pour la tete 2 des ventes à deux têtes ")
 legend("topright", legend = c("Tr_dif"), col = c("cyan"), lwd = 3, bty = "n")
+
+## 5)bis) Stat des sur Tr_dif sur les ventes à deux têtes, focus sur la tête 2, femme / homme
+deuxtete_tete2_femme = deuxtete_tete2[deuxtete_tete2$b_sexe == 2,]
+deuxtete_tete2_homme = deuxtete_tete2[deuxtete_tete2$b_sexe == 1,]
+summary(deuxtete_tete2_femme $ Tr_dif)
+summary(deuxtete_tete2_homme $ Tr_dif)
+
+resultat_test <- t.test(deuxtete_tete2_femme$ Tr_dif, mu = 0)
+print(resultat_test)
+resultat_test2 <- t.test(deuxtete_tete2_homme$ Tr_dif, mu = 0)
+print(resultat_test2)
+
+donnees_sans_na <- na.omit(deuxtete_tete2_femme$Tr_dif)
+densite <- density(donnees_sans_na)
+
+donnees_sans_na2 <- na.omit(deuxtete_tete2_homme$Tr_dif)
+densite2 <- density(donnees_sans_na2)
+
+max_density <- max(densite$y, densite2$y)
+plot(densite, col = "orange", lwd = 3, main = "Densités de Tr_dif pour la tete 2 (homme vs femme) des ventes à deux têtes ", ylim = c(0, max_density))
+lines(densite2, col = "cyan", lwd = 3)
+legend("topright", legend = c("Tr_dif femme", 'Tr_dif homme'), col = c("orange","cyan"), lwd = 3, bty = "n")
+
 
 ##########
 
@@ -826,14 +872,7 @@ tirage <- function(data, nb.obs) {
 }
 
 
-tirage2 <- function(data, nb.obs) {
-  echantillon <-  sample(1:nrow(data), size = nb.obs, replace = TRUE)
-  data <- data[echantillon,]
-  return(data)
-}
-
-
-clones.list <- lapply(clones.list, tirage, nb.obs = 4)
+clones.list <- lapply(clones.list, tirage, nb.obs = 1)
 clones <- do.call(rbind, clones.list)
 
 rm(clones.list, tirage)
@@ -841,6 +880,10 @@ rm(clones.list, tirage)
 clone.Td <- clones$Td_clone
 clone.ltrunc <- clones$ltrunc
 clone.rtrunc <- clones$rtrunc
+
+liste_jd = unique(vendeurs $ jd)
+
+clones <- clones[clones $ jd %in% liste_jd, ]
 
 table(c(vendeurs$groupe, clones$groupe))
 
@@ -1091,6 +1134,10 @@ clonetranche4.estim <- data.frame(group = "Tranche 4 Clone", time = resultstranc
 
 estimationstranche4 <- rbind(vendtranche4.estim, clonetranche4.estim)
 
+summary(estimationstranche1)
+summary(estimationstranche2)
+summary(estimationstranche3)
+summary(estimationstranche4)
 
 ## Affichage graphique 
 p1 <-ggplot(data = estimationstranche1, aes(x = time, y = survival)) +
@@ -1240,7 +1287,10 @@ clonedec4.estim <- data.frame(group = "Dec 4 Clone", time = resultsdec4.clone$ti
 
 estimationsdec4 <- rbind(venddec4.estim, clonedec4.estim)
 
-
+summary(estimationsdec1)
+summary(estimationsdec2)
+summary(estimationsdec3)
+summary(estimationsdec4)
 ## Affichage graphique 
 p1 <-ggplot(data = estimationsdec1, aes(x = time, y = survival)) +
   theme_classic() +
@@ -1276,6 +1326,68 @@ p4 <-ggplot(data = estimationstranche4, aes(x = time, y = survival)) +
 
 grid.arrange(p1, p2, p3, p4, ncol = 2)
 
+
+
+# Croiser les informations : 
+liste_graphiques <- list()
+for (i in c(1, 2, 3, 4)) {
+  for (j in c(1, 2, 3, 4)) {
+    e.vend <- cdfDT(y = vendeurs$Td[(vendeurs$dec == i)&(vendeurs$tranche_age == j)], 
+                    l = vendeurs$ltrunc[(vendeurs$dec == i)&(vendeurs$tranche_age == j)], 
+                    r = vendeurs$rtrunc[(vendeurs$dec == i)&(vendeurs$tranche_age == j)], 
+                              plot.cdf = FALSE, display = FALSE, boot = TRUE)
+    
+    r.clone <- cdfDT(y = clones$Td_clone[(clones$dec == i)&(clones$tranche_age == j)], 
+                     l = clones$ltrunc[(clones$dec == i)&(clones$tranche_age == j)], 
+                     r = clones$rtrunc[(clones$dec == i)&(clones$tranche_age == j)], 
+                               plot.cdf = FALSE, display = FALSE, boot = TRUE)
+    
+    vende.estim <- data.frame(group = paste("Vendeurs, dec, tranche_age :", i, j) , 
+                                time = e.vend$time, 
+                                 survival = e.vend$Survival, 
+                                 CI.lower = 1 - e.vend$CI.lower.F,
+                                 CI.upper = 1 - e.vend$CI.upper.F)
+    
+    
+    cloner.estim <- data.frame(group = paste("Clones, dec, tranche_age :", i, j), 
+                                  time = r.clone$time, 
+                                  survival = r.clone$Survival, 
+                                  CI.lower = 1 - r.clone$CI.lower.F,
+                                  CI.upper = 1 - r.clone$CI.upper.F)
+    
+    
+    assign(paste("estim",i,j, sep = "-"), rbind(vende.estim, cloner.estim))
+    
+    nom_graphique <- paste("p", i, j, sep = "-")
+    graphique <- ggplot(data =  get(paste("estim",i,j, sep = "-")), aes(x = time, y = survival)) +
+      theme_classic() +
+      geom_line(aes(group = group, colour = group)) +
+      geom_ribbon(aes(group = group, fill = group, ymin = CI.lower, ymax = CI.upper), 
+                  alpha = 1/3) +
+      ggtitle(paste("Estimation des survies des vendeurs et clones dec, tranche  (avec 95% IC) :",i,j)) +
+      xlab("Jours") + ylab("Fonction de survie")
+    liste_graphiques[[nom_graphique]] <- graphique}}
+
+
+grid.arrange(
+  liste_graphiques$`p-1-1`, liste_graphiques$`p-1-2`, liste_graphiques$`p-1-3`, liste_graphiques$`p-1-4`,
+  liste_graphiques$`p-2-1`, liste_graphiques$`p-2-2`, liste_graphiques$`p-2-3`, liste_graphiques$`p-2-4`,
+  ncol = 2
+)
+
+grid.arrange(
+  liste_graphiques$`p-3-1`, liste_graphiques$`p-3-2`, liste_graphiques$`p-3-3`, liste_graphiques$`p-3-4`,
+  liste_graphiques$`p-4-1`, liste_graphiques$`p-4-2`, liste_graphiques$`p-4-3`, liste_graphiques$`p-4-4`,
+  ncol = 2
+)
+
+# corrélation b_année et age_acte 
+vendeurs$age_acte_jour = vendeurs$dateA - vendeurs$dateN
+cor(vendeurs$dateN, vendeurs$age_acte)
+
+
+
+paste("estim", i,j, sep = "-")
 
 ####### Estimation par nombre de clones 
 vendeurs <- subset(donnees, groupe == "seller")
