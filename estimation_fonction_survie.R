@@ -69,8 +69,6 @@ write.csv(donnees, file = "/Users/augustincablant/Desktop/Viagers/merge_clone_se
 ##############################################################################################################
 
 
-
-
 # Autres data frames que nous allons utiliser
 femmes <- subset(donnees, b_sexe == 2)
 hommes <- subset(donnees, b_sexe == 1)
