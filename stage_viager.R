@@ -177,7 +177,7 @@ densite_clone <- density(clones $ Tr_clone)
 
 plot(densite_seller, col = "brown", lwd = 3, main = "Densités de Tr_seller et Tr_clone")
 lines(densite_clone, col = "cyan", lwd = 3)
-legend("topright", legend = c("Tr_seller", "Tr_clone"), col = c("cyan", "brown"), lwd = 3, bty = "n")
+legend("topright", legend = c("Tr_seller", "Tr_clone"), col = c("brown", "cyan"), lwd = 3, bty = "n")
 
 ##########
 
@@ -540,7 +540,7 @@ bouquet4 = subset(clones, downp > 59455)
 test1 <- t.test(bouquet1 $ Tr_dif, mu = 0)
 test2 <- t.test(bouquet2 $ Tr_dif, mu = 0)
 test3 <- t.test(bouquet3 $ Tr_dif, mu = 0)
-test3 <- t.test(bouquet4 $ Tr_dif, mu = 0)
+test4 <- t.test(bouquet4 $ Tr_dif, mu = 0)
 
 print(test1)
 print(test2)
@@ -572,17 +572,17 @@ legend("topright", legend = c("bouquet<= 10671€"," 10671€<bouquet<=27441€"
 
 
 # 14) Par tranche de rente 
-summary(vendeurs $ annuity)
+summary(clones $ annuity)
 
 rente1 = subset(clones, annuity <= 4574)
-rente2 = subset(clones, downp <= 7318 & downp > 4574)
-rente3 = subset(clones, downp <= 12193 & downp > 7318)
-rente4 = subset(clones, downp > 12193)
+rente2 = subset(clones, annuity <= 7318 & annuity > 4574)
+rente3 = subset(clones, annuity <= 12193 & annuity > 7318)
+rente4 = subset(clones, annuity > 12193)
 
 test1 <- t.test(rente1 $ Tr_dif, mu = 0)
 test2 <- t.test(rente2 $ Tr_dif, mu = 0)
 test3 <- t.test(rente3 $ Tr_dif, mu = 0)
-test3 <- t.test(rente4 $ Tr_dif, mu = 0)
+test4 <- t.test(rente4 $ Tr_dif, mu = 0)
 
 print(test1)
 print(test2)
@@ -622,8 +622,14 @@ vendeurs_MCO$sexe_homme = as.numeric(vendeurs_MCO$b_sexe==1)
 vendeurs_MCO$idf = as.numeric(vendeurs_MCO$b_dep %in% c(75,78,91,92,93,94,95))
 vendeurs_MCO$etranger = as.numeric(vendeurs_MCO$b_dep==99)
 vendeurs_MCO$une_tete = as.numeric(vendeurs_MCO$nb_tete==1)
-vendeurs_MCO$rente = vendeurs_MCO$annuity
-vendeurs_MCO$bouquet = vendeurs_MCO$downp
+vendeurs_MCO$rente1 = as.numeric(vendeurs_MCO$annuity<=4574) 
+vendeurs_MCO$rente2 = as.numeric(vendeurs_MCO$annuity<=7318 & vendeurs_MCO$annuity>4574) 
+vendeurs_MCO$rente3 = as.numeric(vendeurs_MCO$annuity<=12193 & vendeurs_MCO$annuity>7318) 
+vendeurs_MCO$rente4 = as.numeric(vendeurs_MCO$annuity>12193) 
+vendeurs_MCO$bouquet1 = as.numeric(vendeurs_MCO$downp<=10671) 
+vendeurs_MCO$bouquet2 = as.numeric(vendeurs_MCO$downp<=27441 & vendeurs_MCO$downp>10671) 
+vendeurs_MCO$bouquet3 = as.numeric(vendeurs_MCO$downp<=59455 & vendeurs_MCO$downp>27441) 
+vendeurs_MCO$bouquet4 = as.numeric(vendeurs_MCO$downp>59455) 
 
 
 modele_regression <- lm(Td ~ sexe_homme + idf + etranger + une_tete + rente + bouquet , data = vendeurs_MCO)
@@ -674,7 +680,9 @@ p6 <- ggplot(data = vendeurs_MCO, aes(x = bouquet, y = Td)) +
 
 grid.arrange(p1, p2, p3, p4, p5, p6, ncol = 2)
 
-
+modele_regression2 <- lm(Td ~ sexe_homme + idf + etranger + une_tete + rente1 + rente2 + 
+                           rente3 + rente4 + bouquet1 + bouquet2 + bouquet3 + bouquet4 , data = vendeurs_MCO)
+summary(modele_regression2)
 ########
 
 
@@ -729,6 +737,10 @@ p6 <- ggplot(data = vendeurs_MCO, aes(x = bouquet, y = Tr)) +
 grid.arrange(p1, p2, p3, p4, p5, p6, ncol = 2)
 
 
+modele_regression2 <- lm(Tr ~ sexe_homme + idf + etranger + une_tete + rente1 + rente2 + 
+                           rente3 + rente4 + bouquet1 + bouquet2 + bouquet3 + bouquet4 , data = vendeurs_MCO)
+summary(modele_regression2)
+
 ##########
 
 
@@ -738,6 +750,14 @@ clones_MCO$sexe_homme = as.numeric(clones_MCO$b_sexe==1)
 clones_MCO$idf = as.numeric(clones_MCO$old_b_dep %in% c(75,78,91,92,93,94,95))
 clones_MCO$etranger = as.numeric(clones_MCO$old_b_dep==99)
 clones_MCO$une_tete = as.numeric(clones_MCO$nb_tete==1)
+clones_MCO$rente1 = as.numeric(clones_MCO$annuity<=4574) 
+clones_MCO$rente2 = as.numeric(clones_MCO$annuity<=7318 & clones_MCO$annuity>4574) 
+clones_MCO$rente3 = as.numeric(clones_MCO$annuity<=12193 & clones_MCO$annuity>7318) 
+clones_MCO$rente4 = as.numeric(clones_MCO$annuity>12193) 
+clones_MCO$bouquet1 = as.numeric(clones_MCO$downp<=10671) 
+clones_MCO$bouquet2 = as.numeric(clones_MCO$downp<=27441 & clones_MCO$downp>10671) 
+clones_MCO$bouquet3 = as.numeric(clones_MCO$downp<=59455 & clones_MCO$downp>27441) 
+clones_MCO$bouquet4 = as.numeric(clones_MCO$downp>59455) 
 
 
 modele_regression <- lm(Tr_dif ~ sexe_homme + idf + etranger + une_tete + downp + annuity , data = clones_MCO)
@@ -789,6 +809,11 @@ p6 <- ggplot(data = clones_MCO, aes(x = annuity, y = Tr_dif)) +
 
 grid.arrange(p1, p2, p3, p4, p5, p6, ncol = 2)
 
+
+modele_regression2 <- lm(Tr_dif ~ sexe_homme + idf + etranger + une_tete + rente1 + rente2 + 
+                           rente3 + rente4 + bouquet1 + bouquet2 + bouquet3 + bouquet4 , data = clones_MCO)
+summary(modele_regression2)
+
 #########
 
 # 18) Régression logistique de indicatrice(Tr_dif > 0) sur sexe, region, bouquet, rente, vente à une têtes 
@@ -796,7 +821,7 @@ grid.arrange(p1, p2, p3, p4, p5, p6, ncol = 2)
 clones_MCO $ indicatrice_Tr = ifelse(clones_MCO$Tr_dif <= 0, 0, 1)
 
 
-modele_regression_logistique <- glm(indicatrice_Tr ~ sexe_homme + idf + etranger + une_tete , data = clones_MCO, family=binomial)
+modele_regression_logistique <- glm(indicatrice_Tr ~ sexe_homme + idf + etranger + une_tete + rente + bouquet , data = clones_MCO, family=binomial)
 summary(modele_regression_logistique)
 
 p1 <- ggplot(data = clones_MCO, aes(x = sexe_homme, y = indicatrice_Tr)) +
@@ -829,6 +854,54 @@ p4 <- ggplot(data = clones_MCO, aes(x = une_tete, y = indicatrice_Tr)) +
 
 
 grid.arrange(p1, p2, p3, p4, ncol = 2)
+
+
+
+modele_regression_logistique <- glm(indicatrice_Tr ~ sexe_homme + idf + etranger + une_tete + rente1 + rente2 + 
+                                      rente3 + rente4 + bouquet1 + bouquet2 + bouquet3 + bouquet4 , data = clones_MCO, family=binomial)
+summary(modele_regression_logistique)
+
+
+# 19) Régression linéaire de Td puis Tr_dif sur type + sexe_homme + idf + etranger + une_tete + rente1 + rente2 + 
+# rente3 + rente4 + bouquet1 + bouquet2 + bouquet3 + bouquet4
+
+for (j in liste_jd) {
+  sub_df = vendeurs[vendeurs$jd == j, ]
+  type_de_viager = sub_df$type_de_viager
+  if (type_de_viager == "Libre / voir remarques" || type_de_viager == "Libre/loué") {
+    clones_MCO[clones_MCO$jd == j, "type"] = "Libre"
+  } else if (type_de_viager == "Occupé ; Libre (2)" || type_de_viager == "50%Libre : 50% occupé") {
+    clones_MCO[clones_MCO$jd == j, "type"] = "Libre"
+  } else if (type_de_viager == "voir remarques" || type_de_viager == "") {
+    clones_MCO[clones_MCO$jd == j, "type"] = "Inconnu"
+  } else if (type_de_viager == "Occupé ; Libre (1)" || type == 'Occupé (sauf chambre de" "Occupé ; Libre (10)' || type == "Occupé (voir remarque)" || type == "Libre/loué et occupé" || type == "Occupé (voir remarques)") {
+    clones_MCO[clones_MCO$jd == j, "type"] = "Occupé"
+  } else if (type_de_viager == "Libre" || type_de_viager == "Occupé") {
+    clones_MCO[clones_MCO$jd == j, "type"] = type
+  }
+}
+
+
+unique(vendeurs$type_de_viager)
+
+clones_MCO $ type_libre = as.numeric(clones_MCO $ type == 'Libre')
+clones_MCO $ type_occupé = as.numeric(clones_MCO $ type == 'Occupé')
+clones_MCO $ type3_inconnu = as.numeric(clones_MCO $ type == 'Inconnu')
+clones_MCO $ type4_ol = as.numeric(clones_MCO $ type == 'Occupé et Libre')
+
+
+modele_regression_type_tdif <- lm(Tr_dif ~ type_libre + sexe_homme + idf + 
+                           etranger + une_tete + downp + annuity, data = clones_MCO)
+summary(modele_regression_type_tdif)
+
+
+modele_regression_type_tdif_binary <- lm(Tr_dif ~ type_libre +sexe_homme + idf + 
+                                    etranger + une_tete + rente1 + rente2 + 
+                                    rente3 + rente4 + bouquet1 + bouquet2 + bouquet3 + bouquet4 , data = clones_MCO)
+summary(modele_regression_type_tdif_binary)
+
+
+
 ################################################################################################################################################ 
 ################################################################################################################################################ 
 ################################################################################################################################################ 
@@ -1383,11 +1456,10 @@ grid.arrange(
 
 # corrélation b_année et age_acte 
 vendeurs$age_acte_jour = vendeurs$dateA - vendeurs$dateN
-cor(vendeurs$dateN, vendeurs$age_acte)
+cor(vendeurs$dateN, vendeurs$age_acte_jour)
 
 
 
-paste("estim", i,j, sep = "-")
 
 ####### Estimation par nombre de clones 
 vendeurs <- subset(donnees, groupe == "seller")
