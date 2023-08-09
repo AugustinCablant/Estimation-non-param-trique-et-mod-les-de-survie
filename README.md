@@ -61,10 +61,11 @@ $V \equiv (V_d,V_s)$
 Notons que la variable $T_s$ est seulement observée pour un vendeur en viager, elle ne l'est pas pour son clone (dans ce cas on sait seulement que $T_s>T_d$). Le but est maintenant de modéliser la distribution jointe de $(T_d,T_s)$ conditionnellement à $X$ et $V$, ou bien, d'une manière équivalente, la distribution de $T_d$ conditionnellement à $T_s$, $X$ et $V$, et la distribution de $T_s$ conditionnellement à $X$ et $V$. 
 
 ## Quelques définitions : 
-Une des caractéristiques des données de survie est l'existence d'observations incomplètes.
-En effet, les données sont souvent recueillies partiellement, notamment, à cause des processus de \textbf{\textit{censure}} et de \textbf{\textit{troncature}}. Les données censurées ou tronquées proviennent du fait qu'on n'a pas accès à toute l'information : au lieu d'observer des réalisations indépendantes et identiquement distribuées (i.i.d.) de durées $T$, on observe la réalisation de la variable $T$ soumise à diverses perturbations, indépendantes ou non du phénomène étudié. 
 
-En probabilité et en statistique, une \textbf{loi tronquée} est une loi conditionnelle, dérivée d'une autre loi de probabilité, où l'on ne garde que les tirages sur un intervalle défini. 
+Une des caractéristiques des données de survie est l'existence d'observations incomplètes.
+En effet, les données sont souvent recueillies partiellement, notamment, à cause des processus de **censure** et de **troncature**. Les données censurées ou tronquées proviennent du fait qu'on n'a pas accès à toute l'information : au lieu d'observer des réalisations indépendantes et identiquement distribuées (i.i.d.) de durées $T$, on observe la réalisation de la variable $T$ soumise à diverses perturbations, indépendantes ou non du phénomène étudié. 
+
+En probabilité et en statistique, une loi **tronquée** est une loi conditionnelle, dérivée d'une autre loi de probabilité, où l'on ne garde que les tirages sur un intervalle défini. 
 Soit $X$ une variable aléatoire réelle de fonction de répartition $F$, admettant une densité par rapport à la mesure de lebesque. On note $ f := \frac{dP_{x}}{d \lambda _{LEB}}$. 
 X est tronquée par un sous ensemble éventuellement aléatoire $A$ de $\mathbb{R}^{+}$ si on observe uniquement $X | X \in A$. Les points de l'échantillon tronqué appartiennent tous à $A$,et suivent donc la loi de $X$ conditionnée par $X \in A$. 
 \bigskip 
@@ -75,6 +76,7 @@ L'individu $i$ est observable si et seulement s'il est décédé avant la fin de
 Autrement dit : $T_{birth,i} + T_i \leq \tau _{end}$ et $T_{s,i} \leq T_{birth,i} + T_i $. 
 L'ensemble de troncature noté $T$ est : $T := \{ i : T_{s,i} - T_{birth,i} \leq T_{i} \leq \tau _{end} - \tau_{birth , i} \}$. 
 Ainsi, $T_{i}$ est tronquée à gauche et à droite.
+
 
 
 
