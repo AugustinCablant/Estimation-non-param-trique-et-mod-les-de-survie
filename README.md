@@ -69,9 +69,8 @@ En probabilité et en statistique, une loi **tronquée** est une loi conditionne
 Soit $X$ une variable aléatoire réelle de fonction de répartition $F$, admettant une densité par rapport à la mesure de lebesque. On note 
 $ f := \frac{ dP_{x} }{d \lambda _{LEB}} $. 
 X est tronquée par un sous ensemble éventuellement aléatoire $A$ de $ \mathbb{R}^{+} $ si on observe uniquement $ X | X \in A $. Les points de l'échantillon tronqué appartiennent tous à $A$,et suivent donc la loi de $X$ conditionnée par $X \in A$. 
-\bigskip 
 
-\noindent \textbf{Pour notre modèle} : 
+Pour notre modèle : 
 Dans notre cas, en notant $T_{i}$ la durée de vie du vendeur (en jours) $i$, $T_{s,i}$ l'âge auquel la personne vend son bien en viager (en jours) et $T_{birth,i}$ la date à laquelle le vendeur en viager naît. 
 L'individu $i$ est observable si et seulement s'il est décédé avant la fin de l'observation (01-07-2023) $\tau_{end}$ et qu'il a vendu son bien avant de décéder. On l'observe uniquement à partir du moment où le contrat a été signé. 
 Autrement dit : $T_{birth,i} + T_i \leq \tau _{end}$ et $T_{s,i} \leq T_{birth,i} + T_i $. 
