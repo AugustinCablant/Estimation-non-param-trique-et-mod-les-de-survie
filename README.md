@@ -66,8 +66,9 @@ Une des caractéristiques des données de survie est l'existence d'observations 
 En effet, les données sont souvent recueillies partiellement, notamment, à cause des processus de **censure** et de **troncature**. Les données censurées ou tronquées proviennent du fait qu'on n'a pas accès à toute l'information : au lieu d'observer des réalisations indépendantes et identiquement distribuées (i.i.d.) de durées $T$, on observe la réalisation de la variable $T$ soumise à diverses perturbations, indépendantes ou non du phénomène étudié. 
 
 En probabilité et en statistique, une loi **tronquée** est une loi conditionnelle, dérivée d'une autre loi de probabilité, où l'on ne garde que les tirages sur un intervalle défini. 
-Soit $X$ une variable aléatoire réelle de fonction de répartition $F$, admettant une densité par rapport à la mesure de lebesque. On note $ f := \frac{dP_{x}}{d \lambda _{LEB}}$. 
-X est tronquée par un sous ensemble éventuellement aléatoire $A$ de $\mathbb{R}^{+}$ si on observe uniquement $X | X \in A$. Les points de l'échantillon tronqué appartiennent tous à $A$,et suivent donc la loi de $X$ conditionnée par $X \in A$. 
+Soit $X$ une variable aléatoire réelle de fonction de répartition $F$, admettant une densité par rapport à la mesure de lebesque. On note 
+$ f := \frac{ dP_{x} }{d \lambda _{LEB}} $. 
+X est tronquée par un sous ensemble éventuellement aléatoire $A$ de $ \mathbb{R}^{+} $ si on observe uniquement $ X | X \in A $. Les points de l'échantillon tronqué appartiennent tous à $A$,et suivent donc la loi de $X$ conditionnée par $X \in A$. 
 \bigskip 
 
 \noindent \textbf{Pour notre modèle} : 
