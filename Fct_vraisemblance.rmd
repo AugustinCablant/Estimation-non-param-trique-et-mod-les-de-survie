@@ -1,0 +1,33 @@
+# Description du modèle 
+
+## Notations 
+
+$T_d \equiv$ la durée de vie (en jours) d'une personne 
+
+$T_s \equiv$ l'âge (en jours) au moment où la personne vend son bien en viager
+
+$X \equiv$ un vecteur contenant les déterminants observables de $T_s$ et $T_d$ (genre, jour de naissance, département de naissance, etc.)
+
+$\tau_{birth} \equiv$ la date de naissance de l'individu
+
+$\tau_{contract} \equiv$ la date de la vente en viager
+
+$\tau_{end} \equiv$ la date de la fin d'observation des fichiers INSEE (31-12-2022)
+
+$V_d \equiv$ une variable captant l'effet des déterminants inobservables de $T_d$ (état de santé, richesse, niveau d'éducation)
+
+$V_s \equiv$ une variable captant l'effet des déterminants inobservables de $T_s$ (potentiellement les mêmes variables que celles captées 
+par $V_d$, une variable indiquant si la personne a des enfants, une autre variable indiquant si elle a perdu son conjoint, etc.)
+
+
+```{r} 
+insert code 
+```
+
+## Include graphics 
+insert "\fig"
+
+```{r <label>, echo='FALSE', out.width='100%', fig.cap=''}
+knitr::include_graphics('')
+```
+
