@@ -171,3 +171,11 @@ parametres_depart <- list(runif(19, min = 0, max = 1))
 fit <- mle2(log_likelihood, start = parametres_depart, data = list(donnees = donnees))
 
 log_likelihood(runif(19, min = 0, max = 1))
+
+
+donnes $ vraissemblance_vendeur = 0 
+donnes $ vraissemblance_clone = 0 
+for (i in donnees$X) {
+    donnes $ vraissemblance_vendeur [i] = LSeller_i(lambda_d, lambda_s, phi_d, phi_s, delta, donnees, i+1)
+    donnes $ vraissemblance_clone [i] = LClone_i(lambda_d, lambda_s, phi_d, phi_s, delta, donnees, i+1)
+  }
