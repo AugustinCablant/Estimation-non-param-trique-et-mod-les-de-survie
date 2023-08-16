@@ -146,3 +146,16 @@ print(LClone_i(np.random.uniform(1,5,size=1),
                 phiS(np.random.uniform(1,5,size=8)),
                 np.random.uniform(1,5,size=1),
                 1))
+
+
+### Estimation ### 
+initial_params = np.random.uniform(2,15,size=19)
+
+result = minimize(likelihood, initial_params, method='L-BFGS-B', options={'maxiter':1000, 'disp': True, 'ftol': 1e-1})
+
+# Résultats
+estimated_params = result.x
+print("Estimated Parameters:", estimated_params)
+print("success ? ", result.success)
+print(result.message)
+### 
