@@ -160,7 +160,14 @@ log_likelihood <- function(parameters) {
 }
 
 # Estimation
-fit <- mle(log_likelihood) 
-# start = list(parameters = runif(19, min = 0, max = 1))
-### 
+#fit <- mle(log_likelihood) 
+
+library(bbmle)
+
+# Spécifier les valeurs de départ
+parametres_depart <- list(runif(19, min = 0, max = 1))
+
+# Effectuer l'estimation du maximum de vraisemblance
+fit <- mle2(log_likelihood, start = parametres_depart, data = list(donnees = donnees))
+
 log_likelihood(runif(19, min = 0, max = 1))
