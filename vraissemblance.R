@@ -106,7 +106,7 @@ LClone_i <- function(lambda_d, lambda_s, phi_d, phi_s, delta, donnees, i) {
 numerateur_d_exp <- exp(-(phi_d[i] * IDD(delta, lambda_d, donnees$Td_clone[i], donnees$Ts_clone[i])))
 numerateur_d <- lambda_d * phi_d[i] * delta * numerateur_d_exp
   
-numerateur_s_exp <- exp(mpfr(-(phi_s[i] * IS(lambda_s, donnees$Ts_clone[i])), precBits = 64))
+numerateur_s_exp <- exp(-(phi_s[i] * IS(lambda_s, donnees$Ts_clone[i])))
 numerateur_s <- lambda_s * phi_s[i] * numerateur_s_exp
   
 numerateur <- numerateur_d * numerateur_s
@@ -118,11 +118,11 @@ t_end <- donnees$tau_end[i] - donnees$tau_birth[i]
 t_begin <- donnees$tau_begin[i] - donnees$tau_birth[i]
 deno <- d * (1 - delta) + s
   
-membre_1 <- - (s * (exp(mpfr(-d * (delta * t_end - (1 - delta) * t_begin), precBits = 64)) - exp(mpfr(-t_end * (d - s), precBits = 64)))) / deno
+membre_1 <- - (s * (exp(-d * (delta * t_end - (1 - delta) * t_begin)) - exp(-t_end * (d - s)))) / deno
   
-membre_2 <- exp(mpfr(-t_end * (d + s), precBits = 64)) - exp(mpfr(-d * t_begin - s * t_end, precBits = 64))
+membre_2 <- exp(-t_end * (d + s)) - exp(-d * t_begin - s * t_end)
   
-membre_3 <- exp(mpfr(-d * t_begin - s * t_end, precBits = 64)) - exp(mpfr(-t_end * (d + s), precBits = 64)) - s * (exp(mpfr(-d * (delta * t_end - (1 - delta) * t_begin) - s * t_begin, precBits = 64)) - exp(mpfr(-t_end * (s + d), precBits = 64))) / deno
+membre_3 <- exp(-d * t_begin - s * t_end) - exp(-t_end * (d + s)) - s * (exp(-d * (delta * t_end - (1 - delta) * t_begin) - s * t_begin) - exp(-t_end * (s + d))) / deno
 
 denominateur <- membre_1 + membre_2 + membre_3
 resultat <- numerateur / denominateur
@@ -153,8 +153,8 @@ log_likelihood <- function(parameters) {
     #cat("Calculating for i =", i, "\n")
     L_seller_i <- LSeller_i(lambda_d, lambda_s, phi_d, phi_s, delta, donnees, i+1)
     L_clone_i <- LClone_i(lambda_d, lambda_s, phi_d, phi_s, delta, donnees, i+1)
-    L_seller_log_sum <- L_seller_log_sum + log(mpfr(L_seller_i, precBits = 64))
-    L_clone_log_sum <- L_clone_log_sum + log(mpfr(L_clone_i, precBits = 64))
+    L_seller_log_sum <- L_seller_log_sum + log(L_seller_i)
+    L_clone_log_sum <- L_clone_log_sum + log(L_clone_i)
   }
   
   loglikelihood <- L_seller_log_sum + L_clone_log_sum
