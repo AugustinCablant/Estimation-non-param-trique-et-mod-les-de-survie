@@ -38,12 +38,12 @@ def log_vraissemblance(sigma_d2, sigma_s2, alpha_d, alpha_s, beta_d, beta_s, del
     def phiD(beta_d): # beta_d est un vecteur de taille 8
         x_i = seller[X].values 
         phi = np.exp(np.dot(x_i,beta_d))
-        return phi / phi.mean()
+        return phi 
 
     def phiS(beta_s): # beta_d est un vecteur de taille 8
         x_i = seller[X].values 
         phi = np.exp(np.dot(x_i,beta_s))
-        return phi / phi.mean()
+        return phi 
     
     phi_d = phiD(beta_d)
     phi_s = phiS(beta_s)
