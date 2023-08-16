@@ -108,7 +108,7 @@ numerateur_s_exp <- exp(mpfr(-(phi_s[i] * IS(lambda_s, donnees$Ts_clone[i])), pr
 numerateur_s <- lambda_s * phi_s[i] * numerateur_s_exp
   
 numerateur <- numerateur_d * numerateur_s
-print(numerateur)
+
   # dénominateur 
 s <- lambda_s * phi_s[i]
 d <- lambda_d * phi_d[i]
@@ -121,9 +121,8 @@ membre_1 <- - (s * (exp(mpfr(-d * (delta * t_end - (1 - delta) * t_begin), precB
 membre_2 <- exp(mpfr(-t_end * (d + s), precBits = 64)) - exp(mpfr(-d * t_begin - s * t_end, precBits = 64))
   
 membre_3 <- exp(mpfr(-d * t_begin - s * t_end, precBits = 64)) - exp(mpfr(-t_end * (d + s), precBits = 64)) - s * (exp(mpfr(-d * (delta * t_end - (1 - delta) * t_begin) - s * t_begin, precBits = 64)) - exp(mpfr(-t_end * (s + d), precBits = 64))) / deno
-print(denominateur)
+
 denominateur <- membre_1 + membre_2 + membre_3
-  
 resultat <- numerateur / denominateur
 return(resultat)}
 ### 
@@ -136,7 +135,13 @@ return(resultat)}
   # lambda_d, lambda_s et delta des réels 
   # beta_d et beta_s des vecteurs de taille 954
 
-log_likelihood <- function(lambda_d, lambda_s, beta_d, beta_s, delta) {
+log_likelihood <- function(parameters) {
+  lambda_d = parameters[1]
+  lambda_s = parameters[2]
+  beta_d = parameters[3:10]
+  beta_s = parameters[11:18]
+  delta = parameters[19]
+
   phi_d <- phiD(beta_d, donnees)
   phi_s <- phiS(beta_s, donnees)
   L_seller_log_sum <- 0
@@ -146,7 +151,6 @@ log_likelihood <- function(lambda_d, lambda_s, beta_d, beta_s, delta) {
     #cat("Calculating for i =", i, "\n")
     L_seller_i <- LSeller_i(lambda_d, lambda_s, phi_d, phi_s, delta, donnees, i+1)
     L_clone_i <- LClone_i(lambda_d, lambda_s, phi_d, phi_s, delta, donnees, i+1)
-    print(L_clone_i)
     L_seller_log_sum <- L_seller_log_sum + log(mpfr(L_seller_i, precBits = 64))
     L_clone_log_sum <- L_clone_log_sum + log(mpfr(L_clone_i, precBits = 64))
   }
@@ -156,14 +160,7 @@ log_likelihood <- function(lambda_d, lambda_s, beta_d, beta_s, delta) {
 }
 
 # Estimation
-parametres_depart <- c(lambda_d = runif(1, min = 0, max = 1), 
-                        lambda_s = runif(1, min = 0, max = 1), 
-                        beta_d = runif(8, min = 0, max = 1),
-                        beta_s = runif(8, min = 0, max = 1), 
-                        delta = runif(1, min = 0, max = 1))
-cat("Starting estimation...\n")
-fit <- mle(log_likelihood, start = parametres_depart) 
-cat("Estimation completed.\n")
+fit <- mle(log_likelihood) 
+# start = list(parameters = runif(19, min = 0, max = 1))
 ### 
-
-log_likelihood(runif(1, min = 0, max = 1),runif(1, min = 0, max = 1),runif(8, min = 0, max = 1),runif(8, min = 0, max = 1),runif(1, min = 0, max = 1))
+log_likelihood(runif(19, min = 0, max = 1))
