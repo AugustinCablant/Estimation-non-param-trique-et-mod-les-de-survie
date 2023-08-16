@@ -1,8 +1,10 @@
 #install.packages("bbmle")
 #install.packages("Rmpfr")
+#library(Rmpfr)
 library(stats4)
 library(bbmle)
-library(Rmpfr)
+
+
 
 ### Chargement des données ###
 donnees <- read.csv('Data/df_vraissemblance1.csv')
@@ -161,8 +163,6 @@ log_likelihood <- function(parameters) {
 
 # Estimation
 #fit <- mle(log_likelihood) 
-
-library(bbmle)
 
 # Spécifier les valeurs de départ
 parametres_depart <- list(runif(19, min = 0, max = 1))
