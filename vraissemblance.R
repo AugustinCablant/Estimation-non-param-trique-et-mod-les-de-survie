@@ -72,10 +72,10 @@ return(I)}
 
 LSeller_i <- function(lambda_d, lambda_s, phi_d, phi_s, delta, donnees, i) {
   # numérateur
-numerateur_d_exp <- exp(mpfr(-(phi_d[i] * IDD(delta, lambda_d, donnees$Td[i], donnees$Ts[i])), precBits = 64))
+numerateur_d_exp <- exp(-(phi_d[i] * IDD(delta, lambda_d, donnees$Td[i], donnees$Ts[i])))
 numerateur_d <- lambda_d * phi_d[i] * delta * numerateur_d_exp
   
-numerateur_s_exp <- exp(mpfr(-(phi_s[i] * IS(lambda_s, donnees$Ts[i])), precBits = 64))
+numerateur_s_exp <- exp((phi_s[i] * IS(lambda_s, donnees$Ts[i])))
 numerateur_s <- lambda_s * phi_s[i] * numerateur_s_exp
   
 numerateur <- numerateur_d * numerateur_s
@@ -101,7 +101,7 @@ return(resultat)}
 
 LClone_i <- function(lambda_d, lambda_s, phi_d, phi_s, delta, donnees, i) {
   # numérateur
-numerateur_d_exp <- exp(mpfr(-(phi_d[i] * IDD(delta, lambda_d, donnees$Td_clone[i], donnees$Ts_clone[i])), precBits = 64))
+numerateur_d_exp <- exp(-(phi_d[i] * IDD(delta, lambda_d, donnees$Td_clone[i], donnees$Ts_clone[i])))
 numerateur_d <- lambda_d * phi_d[i] * delta * numerateur_d_exp
   
 numerateur_s_exp <- exp(mpfr(-(phi_s[i] * IS(lambda_s, donnees$Ts_clone[i])), precBits = 64))
@@ -136,37 +136,34 @@ return(resultat)}
   # lambda_d, lambda_s et delta des réels 
   # beta_d et beta_s des vecteurs de taille 954
 
-log_likelihood <- function(parametres) {
-lambda_d <- parametres[1]
-lambda_s <- parametres[2]
-beta_d <- parametres[3:10]  # 8 éléments pour beta_d
-beta_s <- parametres[11:18]  # 8 éléments pour beta_s
-delta <- parametres[19]
-phi_d <- phiD(beta_d,donnees)
-phi_s <- phiS(beta_s,donnees)
-L_seller_log_sum <- 0
-L_clone_log_sum <- 0
+log_likelihood <- function(lambda_d, lambda_s, beta_d, beta_s, delta) {
+  phi_d <- phiD(beta_d, donnees)
+  phi_s <- phiS(beta_s, donnees)
+  L_seller_log_sum <- 0
+  L_clone_log_sum <- 0
   
-for (i in donnees$X) {
+  for (i in donnees$X) {
+    #cat("Calculating for i =", i, "\n")
     L_seller_i <- LSeller_i(lambda_d, lambda_s, phi_d, phi_s, delta, donnees, i+1)
     L_clone_i <- LClone_i(lambda_d, lambda_s, phi_d, phi_s, delta, donnees, i+1)
+    print(L_clone_i)
     L_seller_log_sum <- L_seller_log_sum + log(mpfr(L_seller_i, precBits = 64))
-    print(L_seller_log_sum)
     L_clone_log_sum <- L_clone_log_sum + log(mpfr(L_clone_i, precBits = 64))
-    }
-
-loglikelihood <- L_seller_log_sum + L_clone_log_sum
-return(-loglikelihood)
+  }
+  
+  loglikelihood <- L_seller_log_sum + L_clone_log_sum
+  return(-loglikelihood)
 }
-###
 
-### Estimation ###
-lambda_d0 <- runif(1, min = 0, max = 1)
-lambda_s0 <- runif(1, min = 0, max = 1)
-delta0 <- runif(1, min = 0, max = 1)
-beta_d0 <- runif(8, min = 0, max = 1)
-beta_s0 <- runif(8, min = 0, max = 1)
-parametres_depart <- c(lambda_d0, lambda_s0, beta_d0, beta_s0, delta0)
-fit <- mle(log_likelihood, start = parametres_depart, data = donnees) 
-print(fit)
+# Estimation
+parametres_depart <- c(lambda_d = runif(1, min = 0, max = 1), 
+                        lambda_s = runif(1, min = 0, max = 1), 
+                        beta_d = runif(8, min = 0, max = 1),
+                        beta_s = runif(8, min = 0, max = 1), 
+                        delta = runif(1, min = 0, max = 1))
+cat("Starting estimation...\n")
+fit <- mle(log_likelihood, start = parametres_depart) 
+cat("Estimation completed.\n")
 ### 
+
+log_likelihood(runif(1, min = 0, max = 1),runif(1, min = 0, max = 1),runif(8, min = 0, max = 1),runif(8, min = 0, max = 1),runif(1, min = 0, max = 1))
