@@ -108,7 +108,7 @@ numerateur_s_exp <- exp(mpfr(-(phi_s[i] * IS(lambda_s, donnees$Ts_clone[i])), pr
 numerateur_s <- lambda_s * phi_s[i] * numerateur_s_exp
   
 numerateur <- numerateur_d * numerateur_s
-  
+print(numerateur)
   # dénominateur 
 s <- lambda_s * phi_s[i]
 d <- lambda_d * phi_d[i]
@@ -121,7 +121,7 @@ membre_1 <- - (s * (exp(mpfr(-d * (delta * t_end - (1 - delta) * t_begin), precB
 membre_2 <- exp(mpfr(-t_end * (d + s), precBits = 64)) - exp(mpfr(-d * t_begin - s * t_end, precBits = 64))
   
 membre_3 <- exp(mpfr(-d * t_begin - s * t_end, precBits = 64)) - exp(mpfr(-t_end * (d + s), precBits = 64)) - s * (exp(mpfr(-d * (delta * t_end - (1 - delta) * t_begin) - s * t_begin, precBits = 64)) - exp(mpfr(-t_end * (s + d), precBits = 64))) / deno
-  
+print(denominateur)
 denominateur <- membre_1 + membre_2 + membre_3
   
 resultat <- numerateur / denominateur
