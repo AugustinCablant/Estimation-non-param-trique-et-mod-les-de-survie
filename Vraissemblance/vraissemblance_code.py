@@ -158,4 +158,3 @@ estimated_params = result.x
 print("Estimated Parameters:", estimated_params)
 print("success ? ", result.success)
 print(result.message)
-### 

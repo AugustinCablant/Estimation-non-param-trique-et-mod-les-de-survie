@@ -38,14 +38,3 @@ Ce répertoire est composé de :
 - Un dossier 'Fonction de survie' où l'on trouve un fichier 'estimation fonction de sruvie' qui effectue dans un premier temps une liste de statistiques descriptives portant sur les vendeurs et les clones du fichier principal et qui ensuite estime la fonction de survie des vendeurs grâce aux estimateurs de Kaplan Meier et de Cox. 
 
 - D'un dossier "vraissemblance" qui a pour but d'écrire et maximiser la fonction de vraisemblance. 
-
-
-
-
-
-
-
-
-
-
-
