@@ -144,22 +144,21 @@ beta_s <- parametres[11:18]  # 8 éléments pour beta_s
 delta <- parametres[19]
 phi_d <- phiD(beta_d,donnees)
 phi_s <- phiS(beta_s,donnees)
-L_seller_vector <- c()
-L_clone_vector <- c()
+L_seller_log_sum <- 0
+L_clone_log_sum <- 0
   
 for (i in donnees$X) {
     L_seller_i <- LSeller_i(lambda_d, lambda_s, phi_d, phi_s, delta, donnees, i+1)
     L_clone_i <- LClone_i(lambda_d, lambda_s, phi_d, phi_s, delta, donnees, i+1)
-    L_seller_vector <- c(L_seller_vector, log(mpfr(L_seller_i, precBits = 64)))
-    L_clone_vector <- c(L_clone_vector, log(mpfr(L_clone_i, precBits = 64)))}
-  
-L_1 <- sum(L_seller_vector)
-L_2 <- sum(L_clone_vector)
-loglikelihood <- L_1 + L_2
-return(-loglikelihood)}
-###
+    L_seller_log_sum <- L_seller_log_sum + log(mpfr(L_seller_i, precBits = 64))
+    print(L_seller_log_sum)
+    L_clone_log_sum <- L_clone_log_sum + log(mpfr(L_clone_i, precBits = 64))
+    }
 
-log_likelihood(parametres_depart)
+loglikelihood <- L_seller_log_sum + L_clone_log_sum
+return(-loglikelihood)
+}
+###
 
 ### Estimation ###
 lambda_d0 <- runif(1, min = 0, max = 1)
@@ -171,5 +170,3 @@ parametres_depart <- c(lambda_d0, lambda_s0, beta_d0, beta_s0, delta0)
 fit <- mle(log_likelihood, start = parametres_depart, data = donnees) 
 print(fit)
 ### 
-
-
