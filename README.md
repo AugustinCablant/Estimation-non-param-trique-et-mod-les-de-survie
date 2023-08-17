@@ -42,9 +42,9 @@ Ce répertoire est composé de :
 ## Principaux résultats : 
 i) Estimation des **fonctions de survie** : 
 <picture>
- <source media="(prefers-color-scheme: dark)" srcset="[YOUR-DARKMODE-IMAGE](https://github.com/AugustinCablant/Estimation-non-param-trique-et-mod-les-de-survie/blob/main/Fonction%20de%20survie/R%C3%A9sultats/survival_function.png)">
- <source media="(prefers-color-scheme: light)" srcset="[YOUR-LIGHTMODE-IMAGE](https://github.com/AugustinCablant/Estimation-non-param-trique-et-mod-les-de-survie/blob/main/Fonction%20de%20survie/R%C3%A9sultats/survival_function.png)">
- <img alt="Un rapide aperçu" src="YOUR-DEFAULT-IMAGE">
+ <source media="(prefers-color-scheme: dark)" srcset="https://github.com/AugustinCablant/Estimation-non-param-trique-et-mod-les-de-survie/blob/main/Fonction%20de%20survie/R%C3%A9sultats/survival_function.png">
+ <source media="(prefers-color-scheme: light)" srcset="[(https://github.com/AugustinCablant/Estimation-non-param-trique-et-mod-les-de-survie/blob/main/Fonction%20de%20survie/R%C3%A9sultats/survival_function.png)](https://github.com/AugustinCablant/Estimation-non-param-trique-et-mod-les-de-survie/blob/main/Fonction%20de%20survie/R%C3%A9sultats/survival_function.png)">
+ <img alt="Un rapide aperçu" src="https://github.com/AugustinCablant/Estimation-non-param-trique-et-mod-les-de-survie/blob/main/Fonction%20de%20survie/R%C3%A9sultats/survival_function.png">
 </picture>
 
 ii) Pour l'**estimation des paramètres** dans le cadre le plus simple (on suppose que $var(V_d)=var(V_s)=0$ et $\delta(t,t_s,x)=\delta$). <br>
