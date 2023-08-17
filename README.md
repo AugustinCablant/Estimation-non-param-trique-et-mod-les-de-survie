@@ -43,36 +43,14 @@ Ce répertoire est composé de :
 i) Estimation des **fonctions de survie** : 
 <picture>
  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/AugustinCablant/Estimation-non-param-trique-et-mod-les-de-survie/blob/main/Fonction%20de%20survie/R%C3%A9sultats/survival_function.png">
- <source media="(prefers-color-scheme: light)" srcset="[(https://github.com/AugustinCablant/Estimation-non-param-trique-et-mod-les-de-survie/blob/main/Fonction%20de%20survie/R%C3%A9sultats/survival_function.png)](https://github.com/AugustinCablant/Estimation-non-param-trique-et-mod-les-de-survie/blob/main/Fonction%20de%20survie/R%C3%A9sultats/survival_function.png)">
+ <source media="(prefers-color-scheme: light)" srcset="https://github.com/AugustinCablant/Estimation-non-param-trique-et-mod-les-de-survie/blob/main/Fonction%20de%20survie/R%C3%A9sultats/survival_function.png">
  <img alt="Un rapide aperçu" src="https://github.com/AugustinCablant/Estimation-non-param-trique-et-mod-les-de-survie/blob/main/Fonction%20de%20survie/R%C3%A9sultats/survival_function.png">
 </picture>
 
 ii) Pour l'**estimation des paramètres** dans le cadre le plus simple (on suppose que $var(V_d)=var(V_s)=0$ et $\delta(t,t_s,x)=\delta$). <br>
-Voici le lien vers le code : [estimation](https://github.com/AugustinCablant/Estimation-non-param-trique-et-mod-les-de-survie/blob/main/Vraissemblance/vraissemblance_code.py) <br>
-<br>
-| Parameter |                      Value                      |  <br>
-+-----------+-------------------------------------------------+  <br>
-|  lambda_d |               -30.659550125563594               |  <br>
-|  lambda_s |                25.039506999029843               |  <br>
-|  beta_d0  |               -30.522912675901814               |  <br>
-|  beta_d1  |                34.810007017242235               |  <br>
-|  beta_d2  |                -49.33468615756241               |  <br>
-|  beta_d3  |                -49.62839881472315               |  <br>
-|  beta_d4  |                49.848439687168714               |  <br>
-|  beta_d5  |               -23.887138433918633               |  <br>
-|  beta_d6  |                 33.7017337661741                |  <br>
-|  beta_d7  |                26.843703414465196               |  <br>
-|  beta_d8  |                -42.71868655709029               |  <br>
-|  beta_s0  |                -38.58476194868536               |  <br>
-|  beta_s1  |                30.242940723686417               |  <br>
-|  beta_s2  |                -13.86566972508601               |  <br>
-|  beta_s3  |                -1.734455518165402               |  <br>
-|  beta_s4  |                32.45084254283722                |  <br>
-|  beta_s5  |                16.67260447570751                |  <br>
-|  beta_s6  |                -35.28304594855922               |  <br>
-|  beta_s7  |                25.40490181568113                |  <br>
-|  beta_s8  |                29.087471212992604               |  <br>
-|   delta   |                20.357750621094294               |  <br>
-|  Success  |                       True                      |  <br>
-|  Message  | CONVERGENCE: REL_REDUCTION_OF_F_<=_FACTR*EPSMCH |  <br>
-+-----------+-------------------------------------------------+  <br>
+Voici le lien vers le code : [estimation](https://github.com/AugustinCablant/Estimation-non-param-trique-et-mod-les-de-survie/blob/main/Vraissemblance/vraissemblance_code.py) 
+<picture>
+ <source media="(prefers-color-scheme: dark)" srcset="https://github.com/AugustinCablant/Estimation-non-param-trique-et-mod-les-de-survie/blob/main/Vraissemblance/result.png">
+ <source media="(prefers-color-scheme: light)" srcset="https://github.com/AugustinCablant/Estimation-non-param-trique-et-mod-les-de-survie/blob/main/Vraissemblance/result.png">
+ <img alt="Un rapide aperçu" src="https://github.com/AugustinCablant/Estimation-non-param-trique-et-mod-les-de-survie/blob/main/Vraissemblance/result.png">
+</picture>
