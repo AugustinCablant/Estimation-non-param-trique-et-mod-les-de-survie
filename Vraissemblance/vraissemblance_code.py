@@ -132,7 +132,7 @@ seller['Ts_clone'] *= 10**-3
 seller['tau_begin'] *= 10**-3
 seller['tau_end'] *= 10**-3
 
-num_repeats = 2 
+num_repeats = 1000 
 parameters_list = [
     "lambda_d", "lambda_s", "delta",
     *["beta_d" + str(i) for i in range(9)],
@@ -143,7 +143,7 @@ parameters_list = [
 data = {"parameters": parameters_list, "valeurs": [0] * len(parameters_list)}
 
 # Répéter le calcul de la minimisation
-for _ in range(num_repeats):
+for _ in tqdm(range(num_repeats)):
     initial_params = np.random.uniform(-50, 50, size=21)
     result = minimize(likelihood, initial_params, method='L-BFGS-B', options={'maxiter': 1000, 'disp': True, 'ftol': 1e-1})
     
@@ -153,7 +153,7 @@ for _ in range(num_repeats):
     message = result.message
     
     # Ajouter les résultats de l'itération actuelle au dictionnaire
-    for i, param in tqdm(enumerate(estimated_params)):
+    for i, param in enumerate(estimated_params):
             if i<=20:
                 data["valeurs"][i] += param
             else:
