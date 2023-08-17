@@ -132,7 +132,7 @@ seller['Ts_clone'] *= 10**-3
 seller['tau_begin'] *= 10**-3
 seller['tau_end'] *= 10**-3
 
-num_repeats = 1000 
+num_repeats = 10 
 parameters_list = [
     "lambda_d", "lambda_s", "delta",
     *["beta_d" + str(i) for i in range(9)],
