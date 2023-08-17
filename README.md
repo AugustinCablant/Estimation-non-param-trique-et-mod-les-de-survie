@@ -41,6 +41,7 @@ Ce répertoire est composé de :
 
 ## Principaux résultats : 
 Pour l'estimation des paramètres dans le cadre le plus simple (on suppose que $var(V_d)=var(V_s)=0$ et $\delta(t,t_s,x)=\delta$). <br>
+Voici le lien vers le code : [estimation](https://github.com/AugustinCablant/Estimation-non-param-trique-et-mod-les-de-survie/blob/main/Vraissemblance/vraissemblance_code.py)
 +-----------+-------------------------------------------------+ <br>
 | Parameter |                      Value                      |  <br>
 +-----------+-------------------------------------------------+  <br>
