@@ -1,4 +1,4 @@
-# Stage
+# Stage au Centre de Recherche pour l'Économie et la Statistique (CREST)
 
 Stage effectué en première année à l'ENSAE.
 
