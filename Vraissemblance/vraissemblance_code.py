@@ -132,35 +132,33 @@ seller['Ts_clone'] *= 10**-3
 seller['tau_begin'] *= 10**-3
 seller['tau_end'] *= 10**-3
 
+num_repeats = 2 
+parameters_list = [
+    "lambda_d", "lambda_s", "delta",
+    *["beta_d" + str(i) for i in range(9)],
+    *["beta_s" + str(i) for i in range(9)]
+]
 
-initial_params = np.random.uniform(-50,50,size=21)
-liste_compteur = []
-result = minimize(likelihood, initial_params, method='L-BFGS-B', options={'maxiter':1000, 'disp': True, 'ftol': 1e-1})
+# Créer un DataFrame avec la colonne "parameters" et la colonne "valeurs"
+data = {"parameters": parameters_list, "valeurs": [0] * len(parameters_list)}
 
-# Résultats
-estimated_params = result.x
-success = result.success
-message = result.message
+# Répéter le calcul de la minimisation
+for _ in range(num_repeats):
+    initial_params = np.random.uniform(-50, 50, size=21)
+    result = minimize(likelihood, initial_params, method='L-BFGS-B', options={'maxiter': 1000, 'disp': True, 'ftol': 1e-1})
+    
+    # Résultats de l'itération actuelle
+    estimated_params = result.x
+    success = result.success
+    message = result.message
+    
+    # Ajouter les résultats de l'itération actuelle au dictionnaire
+    for i, param in tqdm(enumerate(estimated_params)):
+            if i<=20:
+                data["valeurs"][i] += param
+            else:
+                pass
 
-# Créer un tableau
-table = PrettyTable()
-table.field_names = ["Parameter", "Value"]
-
-# Ajouter les résultats au tableau
-for i, param in enumerate(estimated_params):
-    if i==0: 
-        table.add_row(["lambda_d", param])
-    elif i==1:
-        table.add_row(["lambda_s", param])
-    elif i in [k for k in range(2,11)]:
-        table.add_row([f"beta_d{i - 2}", param])
-    elif i in [k for k in range(11,20)]:
-        table.add_row([f"beta_s{i - 11}", param])
-    elif i==20:
-        table.add_row(["delta", param])
-
-table.add_row(["Success", success])
-table.add_row(["Message", message])
-
-# Afficher le tableau
-print(table)
+result = pd.DataFrame(data)
+result['valeurs'] /= num_repeats
+print(result)
