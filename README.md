@@ -40,7 +40,7 @@ Ce répertoire est composé de :
 - D'un dossier "vraissemblance" qui a pour but d'écrire et maximiser la fonction de vraisemblance.
 
 ## Principaux résultats : 
-i) Estimation des **fonctions de survie** : ![Voici un apperçu](Fonction de survie/Résultats/survival_function.png)
+i) Estimation des **fonctions de survie** : [Voici un apperçu](Fonction de survie/Résultats/survival_function.png)
 
 
 ii) Pour l'**estimation des paramètres** dans le cadre le plus simple (on suppose que $var(V_d)=var(V_s)=0$ et $\delta(t,t_s,x)=\delta$). <br>
