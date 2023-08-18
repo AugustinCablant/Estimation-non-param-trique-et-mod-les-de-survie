@@ -132,7 +132,7 @@ seller['Ts_clone'] *= 10**-3
 seller['tau_begin'] *= 10**-3
 seller['tau_end'] *= 10**-3
 
-num_repeats = 10 
+num_repeats = 100
 parameters_list = [
     "lambda_d", "lambda_s", "delta",
     *["beta_d" + str(i) for i in range(9)],
@@ -141,7 +141,7 @@ parameters_list = [
 
 # Créer un DataFrame avec la colonne "parameters" et la colonne "valeurs"
 data = {"parameters": parameters_list, "valeurs": [0] * len(parameters_list)}
-
+all_estimations = []
 # Répéter le calcul de la minimisation
 for _ in tqdm(range(num_repeats)):
     initial_params = np.random.uniform(-50, 50, size=21)
@@ -151,7 +151,7 @@ for _ in tqdm(range(num_repeats)):
     estimated_params = result.x
     success = result.success
     message = result.message
-    
+    all_estimations.append(estimated_params)
     # Ajouter les résultats de l'itération actuelle au dictionnaire
     for i, param in enumerate(estimated_params):
             if i<=20:
@@ -159,6 +159,10 @@ for _ in tqdm(range(num_repeats)):
             else:
                 pass
 
+all_estimations = np.array(all_estimations)
+param_means = np.mean(all_estimations, axis=0)
+param_stds = np.std(all_estimations, axis=0)
 result = pd.DataFrame(data)
 result['valeurs'] /= num_repeats
+result['std'] = param_stds
 print(result)
