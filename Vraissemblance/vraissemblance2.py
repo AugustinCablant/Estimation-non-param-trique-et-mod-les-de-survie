@@ -68,15 +68,12 @@ def log_vraissemblance(sigma_d2, sigma_s2, alpha_d, alpha_s, beta_d, beta_s, del
         numerateur3 = (1 + sigma_s2 * phi_s[i] * IS(seller['Ts'][i])) ** (- sigma_s2 - 1)
         numerateur4 = phi_s[i] * lambdaS(seller['Ts'][i])
         numerateur = numerateur1 * numerateur2 * numerateur3 * numerateur4
-        print(numerateur1, numerateur2, numerateur3, numerateur4)
-        #print(numerateur)
+        
         def int_denominateur(t):
             deno1 = 1 - (1 + sigma_d2 * phi_d[i] * IDD((seller['tau_end'][i] - seller['tau_birth'][i]), t)) ** ( - sigma_d2 - 1)
             deno2 = phi_s[i] * lambdaS(t) * (1 + sigma_s2 * phi_s[i] * IS(t)) ** ( - sigma_d2 - 1)
             return deno1 * deno2
         denominateur = quad(int_denominateur, 0, 10000)[0]
-        #print(denominateur)
-        #print(numerateur, denominateur)
         return numerateur / denominateur
     
     def L_clone(i):
@@ -99,6 +96,8 @@ def log_vraissemblance(sigma_d2, sigma_s2, alpha_d, alpha_s, beta_d, beta_s, del
     vlog_negatif = np.vectorize(log_negatif)
 
     # Retourner la fonction log_vraissemblance 
+    L_seller_sum = 0 
+    L_clone_sum = 0
     for i in tqdm(seller.index.to_list()): 
         Log_seller = vlog_negatif(L_seller(i))
         Log_clone = vlog_negatif(L_clone(i))
@@ -106,11 +105,11 @@ def log_vraissemblance(sigma_d2, sigma_s2, alpha_d, alpha_s, beta_d, beta_s, del
             if Log_seller != np.nan and Log_clone != np.nan and Log_seller != None and Log_clone != None:
                 L_seller_sum = L_seller_sum + Log_seller
                 L_clone_sum = L_clone_sum + Log_clone
-    # Log_vraisemblance
+    
     L_1 = np.sum(L_seller_sum)
     L_2 = np.sum(L_clone_sum)
     Likelihood = L_1 + L_2
     return -Likelihood
 
-log_vraissemblance(np.random.uniform(-50,50), np.random.uniform(-50,50), np.random.uniform(-50,50), np.random.uniform(-50,50), 
+log_vraissemblance(np.random.uniform(1,3), np.random.uniform(1,3), np.random.uniform(-50,50), np.random.uniform(-50,50), 
                    np.random.uniform(-50,50, size=8), np.random.uniform(-50,50, size=8), np.random.uniform(-50,50))
