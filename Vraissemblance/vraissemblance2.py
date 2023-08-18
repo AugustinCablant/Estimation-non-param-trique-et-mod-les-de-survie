@@ -14,7 +14,6 @@ columns = ['type_libre','sexe_homme','idf','etranger','une_tete','dec1','dec2',
            'tau_begin','tau_end']
 
 
-
 def log_vraissemblance(sigma_d2, sigma_s2, alpha_d, alpha_s, beta_d, beta_s, delta): 
     def lambdaD(t): 
         return np.exp(alpha_d * t)
@@ -22,28 +21,27 @@ def log_vraissemblance(sigma_d2, sigma_s2, alpha_d, alpha_s, beta_d, beta_s, del
     def lambdaS(t):
         return alpha_s * (t ** (alpha_s - 1))
 
+    # Après calculs à la main, nous obtenons des valeurs pour les intégrales, les voici :
     def IDD(t1,t2):
-        if t1 > t2: 
-            I = quad(lambdaD, 0, t2)[0] + delta * quad(lambdaD, t1, t2)[0]
-        else:
-            I = quad(lambdaS, 0, t1)[0]
+        if t1 > t2: I = ( (1 - delta) * np.exp(alpha_d * t2) + delta * np.exp(alpha_d * t1) - 1 ) / alpha_d
+        else: I = ( np.exp(alpha_d * t1) - 1 ) / alpha_d
         return I
     
     def ID(t):
-        return quad(lambdaD,0,t)[0]
+        return ( np.exp(alpha_d * t) - 1 ) / alpha_d
 
     def IS(t):
-        return quad(lambdaS,0,t)[0]
+        return t ** alpha_s
     
     def phiD(beta_d): # beta_d est un vecteur de taille 8
         x_i = seller[X].values 
         phi = np.exp(np.dot(x_i,beta_d))
-        return phi 
+        return phi / phi.mean()
 
     def phiS(beta_s): # beta_d est un vecteur de taille 8
         x_i = seller[X].values 
         phi = np.exp(np.dot(x_i,beta_s))
-        return phi 
+        return phi / phi.mean()
     
     phi_d = phiD(beta_d)
     phi_s = phiS(beta_s)
@@ -59,7 +57,7 @@ def log_vraissemblance(sigma_d2, sigma_s2, alpha_d, alpha_s, beta_d, beta_s, del
             deno1 = 1 - (1 + sigma_d2 * phi_d[i] * IDD(seller['tau_end'][i] - seller['tau_birth'][i], t)) ** ( - sigma_d2 - 1)
             deno2 = phi_s[i] * lambdaS(t) * (1 + sigma_s2 * phi_s[i] * IS(t)) ** ( - sigma_d2 - 1)
             return deno1 * deno2
-        denominateur = quad(int_denominateur, 0, 10000)[0]
+        denominateur = quad(int_denominateur, 0, np.inf)[0]
 
         return numerateur / denominateur
     
@@ -73,19 +71,28 @@ def log_vraissemblance(sigma_d2, sigma_s2, alpha_d, alpha_s, beta_d, beta_s, del
             deno1 = 1 - (1 + sigma_d2 * phi_d[i] * IDD(seller['tau_end'][i] - seller['tau_birth'][i], t)) ** ( - sigma_d2 - 1)
             deno2 = phi_s[i] * lambdaS(t) * (1 + sigma_s2 * phi_s[i] * IS(t)) ** ( - sigma_d2 - 1)
             return deno1 * deno2
-        denominateur = quad(int_denominateur, 0, 10000)[0]
+        denominateur = quad(int_denominateur, 0, np.inf)[0]
 
         return numerateur / denominateur
-    
+
+    def log_negatif(x):
+        if x > 0: return np.log(x)
+        elif x <= 0: return -np.log(-x)
+    vlog_negatif = np.vectorize(log_negatif)
+
     # Retourner la fonction log_vraissemblance 
-    log_seller_sum = 0
-    log_clone_sum = 0
-    for i in seller.index.to_list():
-        log_seller_sum += np.log(L_seller(i))
-        log_clone_sum += np.log(L_clone(i))
-    
-    return log_seller_sum + log_clone_sum
+    for i in tqdm(seller.index.to_list()): 
+        Log_seller = vlog_negatif(L_seller(i))
+        Log_clone = vlog_negatif(L_clone(i))
+        if Log_seller != np.inf and Log_clone != np.inf and Log_seller != - np.inf and Log_clone != - np.inf: 
+            if Log_seller != np.nan and Log_clone != np.nan and Log_seller != None and Log_clone != None:
+                L_seller_sum = L_seller_sum + Log_seller
+                L_clone_sum = L_clone_sum + Log_clone
+    # Log_vraisemblance
+    L_1 = np.sum(L_seller_sum)
+    L_2 = np.sum(L_clone_sum)
+    Likelihood = L_1 + L_2
+    return -Likelihood
 
-
-log_vraissemblance(np.random.uniform(0,1), np.random.uniform(0,1), np.random.uniform(0,1), np.random.uniform(0,1), 
-                   np.random.uniform(0,1, size=8), np.random.uniform(0,1, size=8), np.random.uniform(0,1))
+log_vraissemblance(np.random.uniform(-50,50), np.random.uniform(-50,50), np.random.uniform(-50,50), np.random.uniform(-50,50), 
+                   np.random.uniform(-50,50, size=8), np.random.uniform(-50,50, size=8), np.random.uniform(-50,50))
