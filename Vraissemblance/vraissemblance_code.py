@@ -142,7 +142,7 @@ seller['Td_clone'] = seller['Td_clone'] / seller['Td_clone'].mean()
 seller['Ts_clone'] = seller['Ts_clone'] / seller['Ts_clone'].mean()
 
 
-num_repeats = 5
+num_repeats = 2
 parameters_list = [
     "lambda_d", "lambda_s", "delta",
     *["beta_d" + str(i) for i in range(9)],
