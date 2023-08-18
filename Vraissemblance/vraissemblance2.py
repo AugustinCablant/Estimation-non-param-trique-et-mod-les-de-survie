@@ -7,6 +7,22 @@ from tqdm import tqdm
 
 
 seller = pd.read_csv('Data/df_vraissemblance1.csv')
+""""
+seller['tau_birth'] *= 10**-3
+seller['tau_contract'] *= 10**-3
+seller['Td'] = *= 10**-3
+seller['Ts'] *= 10**-3
+seller['Td_clone'] *= 10**-3
+seller['Ts_clone'] *= 10**-3
+seller['tau_begin'] *= 10**-3
+seller['tau_end'] *= 10**-3
+"""
+seller['tau_birth'] = seller['tau_birth'] / seller['tau_birth'].mean()
+seller['tau_contract'] = seller['tau_contract'] / seller['tau_contract'].mean()
+seller['Ts'] = seller['Ts'] / seller['Ts'].mean()
+seller['Td'] = seller['Td'] / seller['Td'].mean()
+seller['Td_clone'] = seller['Td_clone'] / seller['Td_clone'].mean()
+seller['Ts_clone'] = seller['Ts_clone'] / seller['Ts_clone'].mean()
 
 X = ['type_libre','sexe_homme','idf','etranger','une_tete','dec1','dec2','dec3']
 columns = ['type_libre','sexe_homme','idf','etranger','une_tete','dec1','dec2',
@@ -24,7 +40,7 @@ def log_vraissemblance(sigma_d2, sigma_s2, alpha_d, alpha_s, beta_d, beta_s, del
     # Après calculs à la main, nous obtenons des valeurs pour les intégrales, les voici :
     def IDD(t1,t2):
         if t1 > t2: I = ( (1 - delta) * np.exp(alpha_d * t2) + delta * np.exp(alpha_d * t1) - 1 ) / alpha_d
-        else: I = ( np.exp(alpha_d * t1) - 1 ) / alpha_d
+        else: I = ( np.exp(alpha_d * t1 ) - 1 ) / alpha_d
         return I
     
     def ID(t):
@@ -36,12 +52,12 @@ def log_vraissemblance(sigma_d2, sigma_s2, alpha_d, alpha_s, beta_d, beta_s, del
     def phiD(beta_d): # beta_d est un vecteur de taille 8
         x_i = seller[X].values 
         phi = np.exp(np.dot(x_i,beta_d))
-        return phi / phi.mean()
+        return phi 
 
     def phiS(beta_s): # beta_d est un vecteur de taille 8
         x_i = seller[X].values 
         phi = np.exp(np.dot(x_i,beta_s))
-        return phi / phi.mean()
+        return phi 
     
     phi_d = phiD(beta_d)
     phi_s = phiS(beta_s)
@@ -52,17 +68,15 @@ def log_vraissemblance(sigma_d2, sigma_s2, alpha_d, alpha_s, beta_d, beta_s, del
         numerateur3 = (1 + sigma_s2 * phi_s[i] * IS(seller['Ts'][i])) ** (- sigma_s2 - 1)
         numerateur4 = phi_s[i] * lambdaS(seller['Ts'][i])
         numerateur = numerateur1 * numerateur2 * numerateur3 * numerateur4
-        print('new')
-        print("Td", seller['Td'][i])
-        print("sigma", sigma_d2)
-        print("phi", phi_d[i]) 
-        print("IDD", IDD(seller['Td'][i],seller['Ts'][i]))
-        print("lambdaD", lambdaD(seller['Td'][i]))
+        print(numerateur1, numerateur2, numerateur3, numerateur4)
+        #print(numerateur)
         def int_denominateur(t):
-            deno1 = 1 - (1 + sigma_d2 * phi_d[i] * IDD(seller['tau_end'][i] - seller['tau_birth'][i], t)) ** ( - sigma_d2 - 1)
+            deno1 = 1 - (1 + sigma_d2 * phi_d[i] * IDD((seller['tau_end'][i] - seller['tau_birth'][i]), t)) ** ( - sigma_d2 - 1)
             deno2 = phi_s[i] * lambdaS(t) * (1 + sigma_s2 * phi_s[i] * IS(t)) ** ( - sigma_d2 - 1)
             return deno1 * deno2
-        denominateur = quad(int_denominateur, 0, np.inf)[0]
+        denominateur = quad(int_denominateur, 0, 10000)[0]
+        #print(denominateur)
+        #print(numerateur, denominateur)
         return numerateur / denominateur
     
     def L_clone(i):
@@ -72,10 +86,10 @@ def log_vraissemblance(sigma_d2, sigma_s2, alpha_d, alpha_s, beta_d, beta_s, del
         numerateur = numerateur1 * numerateur2 * numerateur3 
 
         def int_denominateur(t):
-            deno1 = 1 - (1 + sigma_d2 * phi_d[i] * IDD(seller['tau_end'][i] - seller['tau_birth'][i], t)) ** ( - sigma_d2 - 1)
+            deno1 = 1 - (1 + sigma_d2 * phi_d[i] * IDD((seller['tau_end'][i] - seller['tau_birth'][i]), t)) ** ( - sigma_d2 - 1)
             deno2 = phi_s[i] * lambdaS(t) * (1 + sigma_s2 * phi_s[i] * IS(t)) ** ( - sigma_d2 - 1)
             return deno1 * deno2
-        denominateur = quad(int_denominateur, 0, np.inf)[0]
+        denominateur = quad(int_denominateur, 0, 10000)[0]
 
         return numerateur / denominateur
 

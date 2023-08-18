@@ -17,12 +17,12 @@ columns = ['type_libre','sexe_homme','sexe_femme','idf','etranger','une_tete','d
 def phiD(beta_d): # beta_d est un vecteur de taille 9
     x_i = seller[X].values 
     phi = np.exp(np.dot(x_i,beta_d))
-    return phi / phi.mean()
+    return phi 
 
 def phiS(beta_s): # beta_d est un vecteur de taille 9
     x_i = seller[X].values 
     phi = np.exp(np.dot(x_i,beta_s))
-    return phi / phi.mean()
+    return phi 
 
 def IDD(delta,lambda_d,t_1,t_2): 
     if t_1 <= t_2:
@@ -122,7 +122,8 @@ def likelihood(parameters):
     Likelihood = L_1 + L_2
     return -Likelihood
 
-# Réduire l'ordre de grandeur des variables 
+# Réduire l'ordre de grandeur des variables
+"""
 seller['tau_birth'] *= 10**-3
 seller['tau_contract'] *= 10**-3
 seller['Td'] *= 10**-3
@@ -131,8 +132,17 @@ seller['Td_clone'] *= 10**-3
 seller['Ts_clone'] *= 10**-3
 seller['tau_begin'] *= 10**-3
 seller['tau_end'] *= 10**-3
+"""
 
-num_repeats = 100
+seller['tau_birth'] = seller['tau_birth'] / seller['tau_birth'].mean()
+seller['tau_contract'] = seller['tau_contract'] / seller['tau_contract'].mean()
+seller['Ts'] = seller['Ts'] / seller['Ts'].mean()
+seller['Td'] = seller['Td'] / seller['Td'].mean()
+seller['Td_clone'] = seller['Td_clone'] / seller['Td_clone'].mean()
+seller['Ts_clone'] = seller['Ts_clone'] / seller['Ts_clone'].mean()
+
+
+num_repeats = 5
 parameters_list = [
     "lambda_d", "lambda_s", "delta",
     *["beta_d" + str(i) for i in range(9)],
