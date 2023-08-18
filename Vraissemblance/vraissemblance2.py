@@ -52,13 +52,17 @@ def log_vraissemblance(sigma_d2, sigma_s2, alpha_d, alpha_s, beta_d, beta_s, del
         numerateur3 = (1 + sigma_s2 * phi_s[i] * IS(seller['Ts'][i])) ** (- sigma_s2 - 1)
         numerateur4 = phi_s[i] * lambdaS(seller['Ts'][i])
         numerateur = numerateur1 * numerateur2 * numerateur3 * numerateur4
-
+        print('new')
+        print("Td", seller['Td'][i])
+        print("sigma", sigma_d2)
+        print("phi", phi_d[i]) 
+        print("IDD", IDD(seller['Td'][i],seller['Ts'][i]))
+        print("lambdaD", lambdaD(seller['Td'][i]))
         def int_denominateur(t):
             deno1 = 1 - (1 + sigma_d2 * phi_d[i] * IDD(seller['tau_end'][i] - seller['tau_birth'][i], t)) ** ( - sigma_d2 - 1)
             deno2 = phi_s[i] * lambdaS(t) * (1 + sigma_s2 * phi_s[i] * IS(t)) ** ( - sigma_d2 - 1)
             return deno1 * deno2
         denominateur = quad(int_denominateur, 0, np.inf)[0]
-
         return numerateur / denominateur
     
     def L_clone(i):
