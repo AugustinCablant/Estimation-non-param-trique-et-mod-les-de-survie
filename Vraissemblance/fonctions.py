@@ -7,7 +7,7 @@ from scipy.integrate import quad
 import random
 from tqdm import tqdm
 
-seller = pd.read_csv('Data/df_vraissemblance1.csv')
+seller = pd.read_csv('Data/dataset_vraissemblance.csv')
 seller['tau_birth'] = seller['tau_birth'] / seller['tau_birth'].mean()
 seller['tau_contract'] = seller['tau_contract'] / seller['tau_contract'].mean()
 seller['Ts'] = seller['Ts'] / seller['Ts'].mean()
@@ -15,14 +15,39 @@ seller['Td'] = seller['Td'] / seller['Td'].mean()
 seller['Td_clone'] = seller['Td_clone'] / seller['Td_clone'].mean()
 seller['Ts_clone'] = seller['Ts_clone'] / seller['Ts_clone'].mean()
 
-X = ['type_libre','sexe_homme','idf','etranger','une_tete','dec1','dec2','dec3']
-columns = ['type_libre','sexe_homme','idf','etranger','une_tete','dec1','dec2',
-           'dec3','tau_birth','tau_contract','Td','Ts','Td_clone','Ts_clone',
-           'tau_begin','tau_end']
+X = ['type_libre','sexe_homme','sexe_femme','idf','etranger','une_tete','dec1','dec2','dec3']
+columns = ['type_libre','sexe_homme','sexe_femme','idf','etranger','une_tete','dec1','dec2',
+           'dec3','tau_birth','tau_contract','Td','Ts','Td_clone','Ts_clone','tau_begin','tau_end']
 
 # Cas le plus simple 
-    
+alpha_d = np.random.uniform(-5, 5, size = 1)
+alpha_s = np.random.uniform(-5, 5, size = 1)
+delta = np.random.uniform(-5, 5, size = 1)
+sigma_d2 = np.random.uniform(0, 3, size = 1)
+sigma_s2 = np.random.uniform(0, 3, size = 1)
+beta_d = np.random.uniform(-5, 5, size = 9)
+beta_s = np.random.uniform(-5, 5, size = 9)
+
+
 # Quelques fonctions utiles 
+def lambdaD(t): 
+    return np.exp(alpha_d * t)
+
+def lambdaS(t):
+    return alpha_s * (t ** (alpha_s - 1))
+
+# Après calculs à la main, nous obtenons des valeurs pour les intégrales, les voici :
+def IDD(t1,t2):
+    if t1 > t2: I = ( (1 - delta) * np.exp(alpha_d * t2) + delta * np.exp(alpha_d * t1) - 1 ) / alpha_d
+    else: I = ( np.exp(alpha_d * t1 ) - 1 ) / alpha_d
+    return I
+
+def ID(t):
+    return ( np.exp(alpha_d * t) - 1 ) / alpha_d
+
+def IS(t):
+    return t ** alpha_s
+
 def phiD(beta_d): # beta_d est un vecteur de taille 9
     x_i = seller[X].values 
     phi = np.exp(np.dot(x_i,beta_d))
@@ -33,68 +58,52 @@ def phiS(beta_s): # beta_d est un vecteur de taille 9
     phi = np.exp(np.dot(x_i,beta_s))
     return phi 
 
-def IDD(delta,lambda_d,t_1,t_2): 
-    if t_1 <= t_2:
-        I = lambda_d * t_1
-    else: 
-        I = lambda_d * (t_2 + delta * (t_1 - t_2))
-    return I 
-
-def ID(lambda_d,t):
-    I = lambda_d * t
-    return I 
-
-def IS(lambda_s,t):
-    I = lambda_s * t
-    return I 
-
-def LSeller_i(lambda_d, lambda_s, phi_d, phi_s,delta, i):
-    # numérateur
-    numerateur_d_exp =  np.exp(-(phi_d[i] * IDD(delta,lambda_d,seller['Td'][i],seller['Ts'][i])))
-    numerateur_d = lambda_d * phi_d[i] * delta * numerateur_d_exp
-    numerateur_s_exp = np.exp(-(phi_s[i] * IS(lambda_s,seller['Ts'][i])))
-    numerateur_s = lambda_s * phi_s[i] * numerateur_s_exp
-    numerateur = numerateur_d * numerateur_s
-    # dénominateur 
-    s = lambda_s * phi_s[i] 
-    d = lambda_d * phi_d[i] 
-    t_end = seller['tau_end'][i] - seller['tau_birth'][i]
-    t_begin = seller['tau_begin'][i] - seller['tau_birth'][i]
-    deno = d * (1 - delta) + s
-    membre_1 = - (s * (np.exp( - d * (delta * t_end - (1 - delta) * t_begin )) - np.exp(- t_end * (d - s)))) / deno
-    membre_2 = np.exp( - t_end * (d + s)) - np.exp( - d * t_begin - s * t_end)
-    membre_3 = np.exp(- d * t_begin - s * t_end) - np.exp( - t_end * (d + s)) - s * (np.exp(- d * (delta * t_end - (1 - delta) * t_begin ) - s * t_begin ) - np.exp( - t_end * (s + d))) / deno    
-    denominateur = membre_1 + membre_2 + membre_3
-    resultat = numerateur / denominateur
-    
-    return resultat
-
-
-def LClone_i(lambda_d, lambda_s, phi_d, phi_s,delta, i):
-    # numérateur
-    numerateur_d_exp =  np.exp(-(phi_d[i] * IDD(delta,lambda_d,seller['Td_clone'][i],seller['Ts_clone'][i])))
-    numerateur_d = lambda_d * phi_d[i] * delta * numerateur_d_exp
-    numerateur_s_exp = np.exp(-(phi_s[i] * IS(lambda_s,seller['Ts_clone'][i])))
-    numerateur_s = lambda_s * phi_s[i] * numerateur_s_exp
-    numerateur = numerateur_d * numerateur_s
-    
-    # dénominateur 
-    s = lambda_s * phi_s[i] 
-    d = lambda_d * phi_d[i] 
-    t_end = seller['tau_end'][i] - seller['tau_birth'][i]
-    t_begin = seller['tau_begin'][i] - seller['tau_birth'][i]
-    deno = d * (1 - delta) + s
-    membre_1 = - (s * (np.exp( - d * (delta * t_end - (1 - delta) * t_begin )) - np.exp(- t_end * (d - s)))) / deno
-    membre_2 = np.exp( - t_end * (d + s)) - np.exp( - d * t_begin - s * t_end)
-    membre_3 = np.exp(- d * t_begin - s * t_end) - np.exp( - t_end * (d + s)) - s * (np.exp(- d * (delta * t_end - (1 - delta) * t_begin ) - s * t_begin ) - np.exp( - t_end * (s + d))) / deno
-    denominateur = membre_1 + membre_2 + membre_3
-    
-    resultat = numerateur / denominateur
-    return resultat
+phi_d = phiD(beta_d)
+phi_s = phiS(beta_s)
 
 def log_negatif(x):
     if x > 0: return np.log(x)
     elif x <= 0: return -np.log(-x)
 vlog_negatif = np.vectorize(log_negatif)
 
-# end 
+def L_seller(i):
+    numerateur1 = (1 + sigma_d2 * phi_d[i] * IDD(seller['Td'][i],seller['Ts'][i])) ** (- sigma_d2 - 1) 
+    numerateur2 = delta * phi_d[i] * lambdaD(seller['Td'][i]) 
+    numerateur3 = (1 + sigma_s2 * phi_s[i] * IS(seller['Ts'][i])) ** (- sigma_s2 - 1)
+    numerateur4 = phi_s[i] * lambdaS(seller['Ts'][i])
+    numerateur = numerateur1 * numerateur2 * numerateur3 * numerateur4
+    
+    def int_denominateur(t):
+        deno1 = 1 - (1 + sigma_d2 * phi_d[i] * IDD((seller['tau_end'][i] - seller['tau_birth'][i]), t)) ** ( - sigma_d2 - 1)
+        print(IDD((seller['tau_end'][i] - seller['tau_birth'][i]), t))
+        deno2 = phi_s[i] * lambdaS(t) * (1 + sigma_s2 * phi_s[i] * IS(t)) ** ( - sigma_d2 - 1)
+        print(lambdaS(t))
+        return deno1 * deno2
+    denominateur = quad(int_denominateur, 0, 10000)[0]
+    return numerateur # / denominateur
+
+"""
+def L_clone(i):
+    numerateur1 = (1 + sigma_d2 * phi_d[i] * ID(seller['Td_clone'][i])) ** (- sigma_d2 - 1) 
+    numerateur2 = delta * phi_d[i] * lambdaD(seller['Td'][i]) 
+    numerateur3 = (1 + sigma_s2 * phi_s[i] * IS(seller['Td_clone'][i])) ** (- sigma_s2 - 1)
+    numerateur = numerateur1 * numerateur2 * numerateur3 
+
+    def int_denominateur(t):
+        deno1 = 1 - (1 + sigma_d2 * phi_d[i] * IDD((seller['tau_end'][i] - seller['tau_birth'][i]), t)) ** ( - sigma_d2 - 1)
+        deno2 = phi_s[i] * lambdaS(t) * (1 + sigma_s2 * phi_s[i] * IS(t)) ** ( - sigma_d2 - 1)
+        return deno1 * deno2
+    denominateur = quad(int_denominateur, 0, 10000)[0]
+
+    return numerateur / denominateur
+"""
+
+i = 61 
+
+def int_denominateur(t):
+        deno1 = 1 - (1 + sigma_d2 * phi_d[i] * IDD((seller['tau_end'][i] - seller['tau_birth'][i]), t)) ** ( - sigma_d2 - 1)
+        deno2 = phi_s[i] * lambdaS(t) * (1 + sigma_s2 * phi_s[i] * IS(t)) ** ( - sigma_d2 - 1)
+        return deno1 * deno2
+
+denominateur = quad(int_denominateur, 0, 10000)[0]
+print(denominateur)
