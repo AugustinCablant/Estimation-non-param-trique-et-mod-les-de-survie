@@ -123,17 +123,6 @@ def likelihood(parameters):
     return -Likelihood
 
 # Réduire l'ordre de grandeur des variables
-"""
-seller['tau_birth'] *= 10**-3
-seller['tau_contract'] *= 10**-3
-seller['Td'] *= 10**-3
-seller['Ts'] *= 10**-3
-seller['Td_clone'] *= 10**-3
-seller['Ts_clone'] *= 10**-3
-seller['tau_begin'] *= 10**-3
-seller['tau_end'] *= 10**-3
-"""
-
 seller['tau_birth'] = seller['tau_birth'] / seller['tau_birth'].mean()
 seller['tau_contract'] = seller['tau_contract'] / seller['tau_contract'].mean()
 seller['Ts'] = seller['Ts'] / seller['Ts'].mean()
