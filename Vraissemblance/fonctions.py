@@ -82,28 +82,3 @@ def L_seller(i):
     denominateur = quad(int_denominateur, 0, 10000)[0]
     return numerateur # / denominateur
 
-"""
-def L_clone(i):
-    numerateur1 = (1 + sigma_d2 * phi_d[i] * ID(seller['Td_clone'][i])) ** (- sigma_d2 - 1) 
-    numerateur2 = delta * phi_d[i] * lambdaD(seller['Td'][i]) 
-    numerateur3 = (1 + sigma_s2 * phi_s[i] * IS(seller['Td_clone'][i])) ** (- sigma_s2 - 1)
-    numerateur = numerateur1 * numerateur2 * numerateur3 
-
-    def int_denominateur(t):
-        deno1 = 1 - (1 + sigma_d2 * phi_d[i] * IDD((seller['tau_end'][i] - seller['tau_birth'][i]), t)) ** ( - sigma_d2 - 1)
-        deno2 = phi_s[i] * lambdaS(t) * (1 + sigma_s2 * phi_s[i] * IS(t)) ** ( - sigma_d2 - 1)
-        return deno1 * deno2
-    denominateur = quad(int_denominateur, 0, 10000)[0]
-
-    return numerateur / denominateur
-"""
-
-i = 61 
-
-def int_denominateur(t):
-        deno1 = 1 - (1 + sigma_d2 * phi_d[i] * IDD((seller['tau_end'][i] - seller['tau_birth'][i]), t)) ** ( - sigma_d2 - 1)
-        deno2 = phi_s[i] * lambdaS(t) * (1 + sigma_s2 * phi_s[i] * IS(t)) ** ( - sigma_d2 - 1)
-        return deno1 * deno2
-
-denominateur = quad(int_denominateur, 0, 10000)[0]
-print(denominateur)

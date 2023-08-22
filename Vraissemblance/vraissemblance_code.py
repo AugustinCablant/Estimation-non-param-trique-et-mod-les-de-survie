@@ -49,8 +49,8 @@ def LSeller_i(lambda_d, lambda_s, phi_d, phi_s,delta, i):
     # dénominateur 
     s = lambda_s * phi_s[i] 
     d = lambda_d * phi_d[i] 
-    t_end = seller['tau_end'][i] - seller['tau_birth'][i]
-    t_begin = seller['tau_begin'][i] - seller['tau_birth'][i]
+    t_end = (seller['tau_end'][i] - seller['tau_birth'][i]) * 10 ** -6
+    t_begin = seller['tau_begin'][i] - seller['tau_birth'][i] * 10 ** -6
     deno = d * (1 - delta) + s
     membre_1 = - (s * (np.exp( - d * (delta * t_end - (1 - delta) * t_begin )) - np.exp(- t_end * (d - s)))) / deno
     membre_2 = np.exp( - t_end * (d + s)) - np.exp( - d * t_begin - s * t_end)
@@ -72,8 +72,8 @@ def LClone_i(lambda_d, lambda_s, phi_d, phi_s,delta, i):
     # dénominateur 
     s = lambda_s * phi_s[i] 
     d = lambda_d * phi_d[i] 
-    t_end = seller['tau_end'][i] - seller['tau_birth'][i]
-    t_begin = seller['tau_begin'][i] - seller['tau_birth'][i]
+    t_end = (seller['tau_end'][i] - seller['tau_birth'][i]) * 10 ** -6
+    t_begin = (seller['tau_begin'][i] - seller['tau_birth'][i]) * 10 ** -6
     deno = d * (1 - delta) + s
     membre_1 = - (s * (np.exp( - d * (delta * t_end - (1 - delta) * t_begin )) - np.exp(- t_end * (d - s)))) / deno
     membre_2 = np.exp( - t_end * (d + s)) - np.exp( - d * t_begin - s * t_end)
