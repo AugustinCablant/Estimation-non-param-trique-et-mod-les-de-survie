@@ -117,7 +117,6 @@ def log_vraissemblance(params):
     L_1 = np.sum(L_seller_sum)
     L_2 = np.sum(L_clone_sum)
     Likelihood = L_1 + L_2
-    print(Likelihood)
     return -Likelihood
 
 print(log_vraissemblance(np.random.uniform(1,3, size = 23)))
