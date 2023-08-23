@@ -114,13 +114,15 @@ def log_vraissemblance(params):
                 compteur +=1
                 L_seller_sum = L_seller_sum + Log_seller
                 L_clone_sum = L_clone_sum + Log_clone
-    liste_compteur.append(compteur)
     L_1 = np.sum(L_seller_sum)
     L_2 = np.sum(L_clone_sum)
     Likelihood = L_1 + L_2
     print(Likelihood)
     return -Likelihood
 
+print(log_vraissemblance(np.random.uniform(1,3, size = 23)))
+
+"""
 liste_compteur = []
 initial_params = np.random.uniform(1,3, size = 23)
 result = minimize(log_vraissemblance, initial_params, method='L-BFGS-B', options={'maxiter': 1000, 'disp': True})
@@ -131,7 +133,7 @@ print(estimated_params)
 print(liste_compteur)
 
 
-"""
+
 num_repeats = 1
 
 parameters_list = [
