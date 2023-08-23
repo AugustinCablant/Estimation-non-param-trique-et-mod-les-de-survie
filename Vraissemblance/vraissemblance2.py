@@ -121,6 +121,17 @@ def log_vraissemblance(params):
     Likelihood = L_1 + L_2
     return -Likelihood
 
+liste_compteur = []
+initial_params = np.random.uniform(1,3, size = 23)
+result = minimize(log_vraissemblance, initial_params, method='L-BFGS-B', options={'maxiter': 1000, 'disp': True, 'ftol': 1e-1})
+estimated_params = result.x
+success = result.success
+message = result.message
+print(estimated_params)
+print(liste_compteur)
+
+
+"""
 num_repeats = 1
 
 parameters_list = [
@@ -135,6 +146,8 @@ data = {"parameters": parameters_list, "valeurs": [0] * len(parameters_list)}
 all_estimations = []
 liste_compteur = []
 liste_compteur_true = []
+
+
 # Répéter le calcul de la minimisation
 for _ in tqdm(range(num_repeats)):
     initial_params = np.random.uniform(1,3, size = 23)
@@ -162,3 +175,4 @@ result['valeurs'] /= len(all_estimations)
 result['std'] = param_stds
 print(result)
 print(liste_compteur_true)
+"""
