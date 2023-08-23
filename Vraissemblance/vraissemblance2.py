@@ -106,10 +106,9 @@ def log_vraissemblance(params):
     L_seller_sum = 0 
     L_clone_sum = 0
     compteur = 0 
-    for i in tqdm(seller.index.to_list()): 
-        epsilon = 1e-10  # Une petite valeur positive
-        Log_seller = vlog_negatif(L_seller(i) + epsilon)
-        Log_clone = vlog_negatif(L_clone(i) + epsilon)
+    for i in seller.index.to_list(): 
+        Log_seller = vlog_negatif(L_seller(i))
+        Log_clone = vlog_negatif(L_clone(i))
         if Log_seller != np.inf and Log_clone != np.inf and Log_seller != - np.inf and Log_clone != - np.inf: 
             if Log_seller != np.nan and Log_clone != np.nan and Log_seller != None and Log_clone != None:
                 compteur +=1
@@ -119,11 +118,12 @@ def log_vraissemblance(params):
     L_1 = np.sum(L_seller_sum)
     L_2 = np.sum(L_clone_sum)
     Likelihood = L_1 + L_2
+    print(Likelihood)
     return -Likelihood
 
 liste_compteur = []
 initial_params = np.random.uniform(1,3, size = 23)
-result = minimize(log_vraissemblance, initial_params, method='L-BFGS-B', options={'maxiter': 1000, 'disp': True, 'ftol': 1e-1})
+result = minimize(log_vraissemblance, initial_params, method='L-BFGS-B', options={'maxiter': 1000, 'disp': True})
 estimated_params = result.x
 success = result.success
 message = result.message
