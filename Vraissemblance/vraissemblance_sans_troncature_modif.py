@@ -17,12 +17,12 @@ columns = ['type_libre','sexe_homme','sexe_femme','idf','etranger','une_tete','d
 def phiD(beta_d): # beta_d est un vecteur de taille 9
     x_i = seller[X].values 
     phi = np.exp(np.dot(x_i,beta_d))
-    return phi 
+    return phi / phi.mean()
 
 def phiS(beta_s): # beta_d est un vecteur de taille 9
     x_i = seller[X].values 
     phi = np.exp(np.dot(x_i,beta_s))
-    return phi 
+    return phi / phi.mean()
 
 def IDD(delta,lambda_d,t_1,t_2): 
     if t_1 <= t_2:
@@ -45,19 +45,7 @@ def LSeller_i(lambda_d, lambda_s, phi_d, phi_s,delta, i):
     numerateur_d = lambda_d * phi_d[i] * delta * numerateur_d_exp
     numerateur_s_exp = np.exp(-(phi_s[i] * IS(lambda_s,seller['Ts'][i])))
     numerateur_s = lambda_s * phi_s[i] * numerateur_s_exp
-    numerateur = numerateur_d * numerateur_s
-    # dénominateur 
-    s = lambda_s * phi_s[i] 
-    d = lambda_d * phi_d[i] 
-    t_end = (seller['tau_end'][i] - seller['tau_birth'][i]) * 10 ** -6
-    t_begin = (seller['tau_begin'][i] - seller['tau_birth'][i]) * 10 ** -6
-    deno = d * (1 - delta) + s
-    membre_1 = - (s * (np.exp( - d * (delta * t_end - (1 - delta) * t_begin )) - np.exp(- t_end * (d - s)))) / deno
-    membre_2 = np.exp( - t_end * (d + s)) - np.exp( - d * t_begin - s * t_end)
-    membre_3 = np.exp(- d * t_begin - s * t_end) - np.exp( - t_end * (d + s)) - s * (np.exp(- d * (delta * t_end - (1 - delta) * t_begin ) - s * t_begin ) - np.exp( - t_end * (s + d))) / deno    
-    denominateur = membre_1 + membre_2 + membre_3
-    resultat = numerateur / denominateur
-    
+    resultat = numerateur_d * numerateur_s
     return resultat
 
 
@@ -67,20 +55,7 @@ def LClone_i(lambda_d, lambda_s, phi_d, phi_s,delta, i):
     numerateur_d = lambda_d * phi_d[i] * delta * numerateur_d_exp
     numerateur_s_exp = np.exp(-(phi_s[i] * IS(lambda_s,seller['Ts_clone'][i])))
     numerateur_s = lambda_s * phi_s[i] * numerateur_s_exp
-    numerateur = numerateur_d * numerateur_s
-    
-    # dénominateur 
-    s = lambda_s * phi_s[i] 
-    d = lambda_d * phi_d[i] 
-    t_end = (seller['tau_end'][i] - seller['tau_birth'][i]) * 10 ** -6
-    t_begin = (seller['tau_begin'][i] - seller['tau_birth'][i]) * 10 ** -6
-    deno = d * (1 - delta) + s
-    membre_1 = - (s * (np.exp( - d * (delta * t_end - (1 - delta) * t_begin )) - np.exp(- t_end * (d - s)))) / deno
-    membre_2 = np.exp( - t_end * (d + s)) - np.exp( - d * t_begin - s * t_end)
-    membre_3 = np.exp(- d * t_begin - s * t_end) - np.exp( - t_end * (d + s)) - s * (np.exp(- d * (delta * t_end - (1 - delta) * t_begin ) - s * t_begin ) - np.exp( - t_end * (s + d))) / deno
-    denominateur = membre_1 + membre_2 + membre_3
-    
-    resultat = numerateur / denominateur
+    resultat = numerateur_d * numerateur_s
     return resultat
 
 def log_negatif(x):
@@ -109,8 +84,9 @@ def likelihood(parameters):
     L_clone_sum = 0
     compteur = 0
     for i in tqdm(seller.index.to_list()): 
-        Log_seller = vlog_negatif(LSeller_i(lambda_d, lambda_s, phi_d, phi_s,delta, i))
-        Log_clone = vlog_negatif(LClone_i(lambda_d, lambda_s, phi_d, phi_s,delta, i))
+        Log_seller = log_negatif(LSeller_i(lambda_d, lambda_s, phi_d, phi_s,delta, i))
+        Log_clone = log_negatif(LClone_i(lambda_d, lambda_s, phi_d, phi_s,delta, i))
+
         if Log_seller != np.inf and Log_clone != np.inf and Log_seller != - np.inf and Log_clone != - np.inf: 
             if Log_seller != np.nan and Log_clone != np.nan and Log_seller != None and Log_clone != None:
                 compteur +=1
@@ -120,7 +96,6 @@ def likelihood(parameters):
     # Log_vraisemblance
     L_1 = np.sum(L_seller_sum)
     L_2 = np.sum(L_clone_sum)
-
     Likelihood = L_1 + L_2
     return -Likelihood
 
@@ -133,7 +108,7 @@ seller['Td_clone'] = seller['Td_clone'] / seller['Td_clone'].mean()
 seller['Ts_clone'] = seller['Ts_clone'] / seller['Ts_clone'].mean()
 
 
-num_repeats = 1
+num_repeats = 10
 parameters_list = [
     "lambda_d", "lambda_s", "delta",
     *["beta_d" + str(i) for i in range(9)],
@@ -144,6 +119,7 @@ parameters_list = [
 data = {"parameters": parameters_list, "valeurs": [0] * len(parameters_list)}
 all_estimations = []
 liste_compteur = []
+liste_compteur_true = []
 # Répéter le calcul de la minimisation
 for _ in tqdm(range(num_repeats)):
     initial_params = np.random.uniform(-50, 50, size=21)
@@ -153,7 +129,9 @@ for _ in tqdm(range(num_repeats)):
     estimated_params = result.x
     success = result.success
     message = result.message
-    all_estimations.append(estimated_params)
+    if liste_compteur[-1] > 900:
+        liste_compteur_true.append(liste_compteur[-1])
+        all_estimations.append(estimated_params)
     # Ajouter les résultats de l'itération actuelle au dictionnaire
     for i, param in enumerate(estimated_params):
             if i<=20:
@@ -165,7 +143,7 @@ all_estimations = np.array(all_estimations)
 param_means = np.mean(all_estimations, axis=0)
 param_stds = np.std(all_estimations, axis=0)
 result = pd.DataFrame(data)
-result['valeurs'] /= num_repeats
+result['valeurs'] /= len(all_estimations)
 result['std'] = param_stds
 print(result)
-print(liste_compteur)
+print(liste_compteur_true)

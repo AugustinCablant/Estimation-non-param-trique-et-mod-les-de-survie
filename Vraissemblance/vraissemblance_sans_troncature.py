@@ -45,19 +45,7 @@ def LSeller_i(lambda_d, lambda_s, phi_d, phi_s,delta, i):
     numerateur_d = lambda_d * phi_d[i] * delta * numerateur_d_exp
     numerateur_s_exp = np.exp(-(phi_s[i] * IS(lambda_s,seller['Ts'][i])))
     numerateur_s = lambda_s * phi_s[i] * numerateur_s_exp
-    numerateur = numerateur_d * numerateur_s
-    # dénominateur 
-    s = lambda_s * phi_s[i] 
-    d = lambda_d * phi_d[i] 
-    t_end = (seller['tau_end'][i] - seller['tau_birth'][i]) * 10 ** -6
-    t_begin = (seller['tau_begin'][i] - seller['tau_birth'][i]) * 10 ** -6
-    deno = d * (1 - delta) + s
-    membre_1 = - (s * (np.exp( - d * (delta * t_end - (1 - delta) * t_begin )) - np.exp(- t_end * (d - s)))) / deno
-    membre_2 = np.exp( - t_end * (d + s)) - np.exp( - d * t_begin - s * t_end)
-    membre_3 = np.exp(- d * t_begin - s * t_end) - np.exp( - t_end * (d + s)) - s * (np.exp(- d * (delta * t_end - (1 - delta) * t_begin ) - s * t_begin ) - np.exp( - t_end * (s + d))) / deno    
-    denominateur = membre_1 + membre_2 + membre_3
-    resultat = numerateur / denominateur
-    
+    resultat = numerateur_d * numerateur_s
     return resultat
 
 
@@ -67,20 +55,8 @@ def LClone_i(lambda_d, lambda_s, phi_d, phi_s,delta, i):
     numerateur_d = lambda_d * phi_d[i] * delta * numerateur_d_exp
     numerateur_s_exp = np.exp(-(phi_s[i] * IS(lambda_s,seller['Ts_clone'][i])))
     numerateur_s = lambda_s * phi_s[i] * numerateur_s_exp
-    numerateur = numerateur_d * numerateur_s
+    resultat = numerateur_d * numerateur_s
     
-    # dénominateur 
-    s = lambda_s * phi_s[i] 
-    d = lambda_d * phi_d[i] 
-    t_end = (seller['tau_end'][i] - seller['tau_birth'][i]) * 10 ** -6
-    t_begin = (seller['tau_begin'][i] - seller['tau_birth'][i]) * 10 ** -6
-    deno = d * (1 - delta) + s
-    membre_1 = - (s * (np.exp( - d * (delta * t_end - (1 - delta) * t_begin )) - np.exp(- t_end * (d - s)))) / deno
-    membre_2 = np.exp( - t_end * (d + s)) - np.exp( - d * t_begin - s * t_end)
-    membre_3 = np.exp(- d * t_begin - s * t_end) - np.exp( - t_end * (d + s)) - s * (np.exp(- d * (delta * t_end - (1 - delta) * t_begin ) - s * t_begin ) - np.exp( - t_end * (s + d))) / deno
-    denominateur = membre_1 + membre_2 + membre_3
-    
-    resultat = numerateur / denominateur
     return resultat
 
 def log_negatif(x):
@@ -107,16 +83,16 @@ def likelihood(parameters):
     phi_s = phiS(beta_s)
     L_seller_sum = 0
     L_clone_sum = 0
-    compteur = 0
+    
     for i in tqdm(seller.index.to_list()): 
         Log_seller = vlog_negatif(LSeller_i(lambda_d, lambda_s, phi_d, phi_s,delta, i))
         Log_clone = vlog_negatif(LClone_i(lambda_d, lambda_s, phi_d, phi_s,delta, i))
         if Log_seller != np.inf and Log_clone != np.inf and Log_seller != - np.inf and Log_clone != - np.inf: 
             if Log_seller != np.nan and Log_clone != np.nan and Log_seller != None and Log_clone != None:
-                compteur +=1
+                
                 L_seller_sum = L_seller_sum + Log_seller
                 L_clone_sum = L_clone_sum + Log_clone
-    liste_compteur.append(compteur)
+    
     # Log_vraisemblance
     L_1 = np.sum(L_seller_sum)
     L_2 = np.sum(L_clone_sum)
@@ -133,7 +109,7 @@ seller['Td_clone'] = seller['Td_clone'] / seller['Td_clone'].mean()
 seller['Ts_clone'] = seller['Ts_clone'] / seller['Ts_clone'].mean()
 
 
-num_repeats = 1
+num_repeats = 100
 parameters_list = [
     "lambda_d", "lambda_s", "delta",
     *["beta_d" + str(i) for i in range(9)],
@@ -168,4 +144,3 @@ result = pd.DataFrame(data)
 result['valeurs'] /= num_repeats
 result['std'] = param_stds
 print(result)
-print(liste_compteur)
