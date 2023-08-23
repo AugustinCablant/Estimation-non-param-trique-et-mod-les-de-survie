@@ -121,7 +121,7 @@ def log_vraissemblance(params):
     Likelihood = L_1 + L_2
     return -Likelihood
 
-num_repeats = 10
+num_repeats = 1
 
 parameters_list = [
     "sigma_d2", "sigma_s2", "alpha_d", "alpha_s",
