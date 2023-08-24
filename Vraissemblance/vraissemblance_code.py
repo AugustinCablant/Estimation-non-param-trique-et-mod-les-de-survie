@@ -146,7 +146,7 @@ all_estimations = []
 liste_compteur = []
 # Répéter le calcul de la minimisation
 initial_params = np.random.uniform(1, 5, size=21)
-result = minimize(likelihood, initial_params, method='L-BFGS-B', options={'maxiter': 1000, 'disp': True, 'ftol': 1e-1})
+result = minimize(likelihood, initial_params, method='BFGS', options={'maxiter': 1000, 'disp': True, 'ftol': 1e-1})
 
 # Résultats de l'itération actuelle
 estimated_params = result.x
@@ -154,11 +154,7 @@ success = result.success
 message = result.message
 #result['std'] = param_stds
 hessian = result.hess_inv
-print(hessian)
-# Calculer la matrice de covariance (inverse de la matrice hessienne)
 print(estimated_params)
-print(liste_compteur)
-
 # Calculer les écarts types des estimateurs (racine carrée des variances diagonales)
 covariance_matrix = np.linalg.inv(hessian)
 std_deviations = np.sqrt(np.diag(covariance_matrix))
