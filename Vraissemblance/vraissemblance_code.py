@@ -17,12 +17,12 @@ columns = ['type_libre','sexe_homme','sexe_femme','idf','etranger','une_tete','d
 def phiD(beta_d): # beta_d est un vecteur de taille 9
     x_i = seller[X].values 
     phi = np.exp(np.dot(x_i,beta_d))
-    return phi 
+    return phi / phi.mean()
 
 def phiS(beta_s): # beta_d est un vecteur de taille 9
     x_i = seller[X].values 
     phi = np.exp(np.dot(x_i,beta_s))
-    return phi 
+    return phi / phi.mean()
 
 def IDD(delta,lambda_d,t_1,t_2): 
     if t_1 <= t_2:
@@ -145,27 +145,21 @@ data = {"parameters": parameters_list, "valeurs": [0] * len(parameters_list)}
 all_estimations = []
 liste_compteur = []
 # Répéter le calcul de la minimisation
-for _ in tqdm(range(num_repeats)):
-    initial_params = np.random.uniform(-50, 50, size=21)
-    result = minimize(likelihood, initial_params, method='L-BFGS-B', options={'maxiter': 1000, 'disp': True, 'ftol': 1e-1})
-    
-    # Résultats de l'itération actuelle
-    estimated_params = result.x
-    success = result.success
-    message = result.message
-    all_estimations.append(estimated_params)
-    # Ajouter les résultats de l'itération actuelle au dictionnaire
-    for i, param in enumerate(estimated_params):
-            if i<=20:
-                data["valeurs"][i] += param
-            else:
-                pass
+initial_params = np.random.uniform(1, 5, size=21)
+result = minimize(likelihood, initial_params, method='L-BFGS-B', options={'maxiter': 1000, 'disp': True, 'ftol': 1e-1})
 
-all_estimations = np.array(all_estimations)
-param_means = np.mean(all_estimations, axis=0)
-param_stds = np.std(all_estimations, axis=0)
-result = pd.DataFrame(data)
-result['valeurs'] /= num_repeats
-result['std'] = param_stds
-print(result)
+# Résultats de l'itération actuelle
+estimated_params = result.x
+success = result.success
+message = result.message
+#result['std'] = param_stds
+hessian = result.hess_inv
+print(hessian)
+# Calculer la matrice de covariance (inverse de la matrice hessienne)
+print(estimated_params)
 print(liste_compteur)
+
+# Calculer les écarts types des estimateurs (racine carrée des variances diagonales)
+covariance_matrix = np.linalg.inv(hessian)
+std_deviations = np.sqrt(np.diag(covariance_matrix))
+print("Écarts types des estimateurs :", std_deviations)

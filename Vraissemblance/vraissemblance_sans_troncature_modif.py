@@ -122,7 +122,7 @@ liste_compteur = []
 liste_compteur_true = []
 # Répéter le calcul de la minimisation
 for _ in tqdm(range(num_repeats)):
-    initial_params = np.random.uniform(-50, 50, size=21)
+    initial_params = np.random.uniform(1, 50, size=21)
     result = minimize(likelihood, initial_params, method='L-BFGS-B', options={'maxiter': 1000, 'disp': True, 'ftol': 1e-1})
     
     # Résultats de l'itération actuelle
