@@ -155,14 +155,17 @@ message = result.message
 #result['std'] = param_stds
 hessian = result.hess_inv
 #print(estimated_params)
+
 parameters_list = [
     "lambda_d", "lambda_s", "delta",
     *["beta_d" + str(i) for i in range(9)],
-    *["beta_s" + str(i) for i in range(9)]]
-for i, param in enumerate(estimated_params):
-    print(parameters_list[i], " : ", param)
+    *["beta_s" + str(i) for i in range(9)]
+    ]
 
 # Calculer les écarts types des estimateurs (racine carrée des variances diagonales)
 covariance_matrix = np.linalg.inv(hessian)
 std_deviations = np.sqrt(np.diag(covariance_matrix))
-print("Écarts types des estimateurs :", std_deviations)
+#print("Écarts types des estimateurs :", std_deviations)
+
+for i, param in enumerate(estimated_params):
+    print(parameters_list[i], " : ", param, "     std : ", std_deviations[i])
