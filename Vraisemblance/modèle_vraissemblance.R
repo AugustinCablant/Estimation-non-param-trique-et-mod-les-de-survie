@@ -146,30 +146,11 @@ num_repeats <- 2
 parameters_list <- c("lambda_d", "lambda_s", "delta", 
                     paste0("beta_d", 0:8), paste0("beta_s", 0:8))
 
-data <- data.frame(parameters = parameters_list, 
-                   valeurs = rep(0, length(parameters_list)))
-all_estimations <- matrix(0, ncol = length(parameters_list), nrow = num_repeats)
 
-for (i in 1:num_repeats) {
-  initial_params <- runif(21, -50, 50)
-  result <- nlminb(start = initial_params, objective = likelihood, 
+initial_params <- runif(21, -50, 50)
+result <- nlminb(start = initial_params, objective = likelihood, 
                    control = list(iter.max = 1000))
 
-  estimated_params <- result$par
-  all_estimations[i, ] <- estimated_params
-
-  for (j in seq_len(length(estimated_params))) 
-  { 
-    if (j <= 21) {
-      data$valeurs[j] <- data$valeurs[j] + estimated_params[j]
-    }
-  }
-}
-
-param_means <- colMeans(all_estimations)
-param_stds <- apply(all_estimations, 2, sd)
-
-result <- data.frame(parameters = parameters_list, 
-                     valeurs = param_means, 
-                     std = param_stds) 
+estimated_params <- result$par
 print(result)
+std <- result$

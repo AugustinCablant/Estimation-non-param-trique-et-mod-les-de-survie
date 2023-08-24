@@ -109,7 +109,6 @@ def likelihood(parameters):
     L_clone_sum = 0
     compteur = 0
     for i in tqdm(seller.index.to_list()): 
-        print(LSeller_i(lambda_d, lambda_s, phi_d, phi_s,delta, i))
         Log_seller = vlog_negatif(LSeller_i(lambda_d, lambda_s, phi_d, phi_s,delta, i))
         Log_clone = vlog_negatif(LClone_i(lambda_d, lambda_s, phi_d, phi_s,delta, i))
         if Log_seller != np.inf and Log_clone != np.inf and Log_seller != - np.inf and Log_clone != - np.inf: 
@@ -155,7 +154,14 @@ success = result.success
 message = result.message
 #result['std'] = param_stds
 hessian = result.hess_inv
-print(estimated_params)
+#print(estimated_params)
+parameters_list = [
+    "lambda_d", "lambda_s", "delta",
+    *["beta_d" + str(i) for i in range(9)],
+    *["beta_s" + str(i) for i in range(9)]]
+for i, param in enumerate(estimated_params):
+    print(parameters_list[i], " : ", param)
+
 # Calculer les écarts types des estimateurs (racine carrée des variances diagonales)
 covariance_matrix = np.linalg.inv(hessian)
 std_deviations = np.sqrt(np.diag(covariance_matrix))
