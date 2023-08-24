@@ -10,16 +10,16 @@ from prettytable import PrettyTable
 seller = pd.read_csv('Data/dataset_vraissemblance.csv')
 
 
-X = ['type_libre','sexe_homme','sexe_femme','idf','etranger','une_tete','dec1','dec2','dec3']
-columns = ['type_libre','sexe_homme','sexe_femme','idf','etranger','une_tete','dec1','dec2','dec3','tau_birth','tau_contract','Td','Ts','Td_clone','Ts_clone','tau_begin','tau_end']
+X = ['sexe_femme','idf','etranger','dec1','dec2','dec3']
+columns = ['sexe_femme','idf','etranger','dec1','dec2','dec3','tau_birth','tau_contract','Td','Ts','Td_clone','Ts_clone','tau_begin','tau_end']
 
 ### Quelques fonctions utiles ###
-def phiD(beta_d): # beta_d est un vecteur de taille 9
+def phiD(beta_d): 
     x_i = seller[X].values 
     phi = np.exp(np.dot(x_i,beta_d))
     return phi / phi.mean()
 
-def phiS(beta_s): # beta_d est un vecteur de taille 9
+def phiS(beta_s): 
     x_i = seller[X].values 
     phi = np.exp(np.dot(x_i,beta_s))
     return phi / phi.mean()
@@ -94,13 +94,13 @@ def likelihood(parameters):
 
     # Paramètres à trouver
     # lambda_d, lambda_s et delta des réels 
-    # beta_d et beta_s des vecteurs de taille 8
+    # beta_d et beta_s des vecteurs de taille 6
 
     parameters = list(parameters)
     lambda_d = parameters[0]
     lambda_s = parameters[1]
-    beta_d = list(parameters[2:11])
-    beta_s = list(parameters[11:20])
+    beta_d = list(parameters[2:8])
+    beta_s = list(parameters[8:14])
     delta = parameters[-1]
 
     phi_d = phiD(beta_d)
@@ -131,13 +131,13 @@ seller['Ts_clone'] = seller['Ts_clone'] / seller['Ts_clone'].mean()
 
 parameters_list = [
     "lambda_d", "lambda_s", "delta",
-    *["beta_d" + str(i) for i in range(9)],
-    *["beta_s" + str(i) for i in range(9)]
+    *["beta_d" + str(i) for i in range(8)],
+    *["beta_s" + str(i) for i in range(8)]
 ]
 
 # Répéter le calcul de la minimisation
-initial_params = np.random.uniform(1, 5, size=21)
-result = minimize(likelihood, initial_params, method='BFGS', options={'maxiter': 1000, 'disp': True, 'ftol': 1e-1})
+initial_params = np.random.uniform(1, 5, size=15)
+result = minimize(likelihood, initial_params, method='BFGS', options={'maxiter': 10000, 'disp': True})
 
 # Résultats de l'itération actuelle
 estimated_params = result.x
@@ -149,8 +149,8 @@ hessian = result.hess_inv
 
 parameters_list = [
     "lambda_d", "lambda_s", "delta",
-    *["beta_d" + str(i) for i in range(9)],
-    *["beta_s" + str(i) for i in range(9)]
+    *["beta_d" + str(i) for i in range(6)],
+    *["beta_s" + str(i) for i in range(6)]
     ]
 
 # Calculer les écarts types des estimateurs (racine carrée des variances diagonales)
