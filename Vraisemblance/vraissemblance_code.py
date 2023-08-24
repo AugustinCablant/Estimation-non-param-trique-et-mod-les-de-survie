@@ -131,13 +131,13 @@ seller['Ts_clone'] = seller['Ts_clone'] / seller['Ts_clone'].mean()
 
 parameters_list = [
     "lambda_d", "lambda_s", "delta",
-    *["beta_d" + str(i) for i in range(8)],
-    *["beta_s" + str(i) for i in range(8)]
+    *["beta_d" + str(i) for i in range(6)],
+    *["beta_s" + str(i) for i in range(6)]
 ]
 
 # Répéter le calcul de la minimisation
 initial_params = np.random.uniform(1, 5, size=15)
-result = minimize(likelihood, initial_params, method='BFGS', options={'maxiter': 10000, 'disp': True})
+result = minimize(likelihood, initial_params, method='Nelder-Mead', options={'disp': True})
 
 # Résultats de l'itération actuelle
 estimated_params = result.x

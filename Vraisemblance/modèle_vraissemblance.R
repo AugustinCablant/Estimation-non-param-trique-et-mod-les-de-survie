@@ -142,14 +142,13 @@ seller$Td <- seller$Td / mean(seller$Td)
 seller$Td_clone <- seller$Td_clone / mean(seller$Td_clone)
 seller$Ts_clone <- seller$Ts_clone / mean(seller$Ts_clone)
 
-num_repeats <- 2
 parameters_list <- c("lambda_d", "lambda_s", "delta", 
                     paste0("beta_d", 0:8), paste0("beta_s", 0:8))
 
 
-initial_params <- runif(21, -50, 50)
+initial_params <- runif(21, 1, 5)
 result <- nlminb(start = initial_params, objective = likelihood, 
-                   control = list(iter.max = 1000))
+                   control = list(iter.max = 10000))
 
 estimated_params <- result$par
 print(result)
