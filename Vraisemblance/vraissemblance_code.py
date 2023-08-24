@@ -137,7 +137,7 @@ parameters_list = [
 
 # Répéter le calcul de la minimisation
 initial_params = np.random.uniform(1, 5, size=15)
-result = minimize(likelihood, initial_params, method='Nelder-Mead', options={'disp': True})
+result = minimize(likelihood, initial_params, method='BFGS', options={'disp': True})
 
 # Résultats de l'itération actuelle
 estimated_params = result.x
