@@ -107,16 +107,13 @@ def likelihood(parameters):
     phi_s = phiS(beta_s)
     L_seller_sum = 0
     L_clone_sum = 0
-    compteur = 0
     for i in tqdm(seller.index.to_list()): 
         Log_seller = vlog_negatif(LSeller_i(lambda_d, lambda_s, phi_d, phi_s,delta, i))
         Log_clone = vlog_negatif(LClone_i(lambda_d, lambda_s, phi_d, phi_s,delta, i))
         if Log_seller != np.inf and Log_clone != np.inf and Log_seller != - np.inf and Log_clone != - np.inf: 
             if Log_seller != np.nan and Log_clone != np.nan and Log_seller != None and Log_clone != None:
-                compteur +=1
                 L_seller_sum = L_seller_sum + Log_seller
                 L_clone_sum = L_clone_sum + Log_clone
-    liste_compteur.append(compteur)
     # Log_vraisemblance
     L_1 = np.sum(L_seller_sum)
     L_2 = np.sum(L_clone_sum)
@@ -132,18 +129,12 @@ seller['Td'] = seller['Td'] / seller['Td'].mean()
 seller['Td_clone'] = seller['Td_clone'] / seller['Td_clone'].mean()
 seller['Ts_clone'] = seller['Ts_clone'] / seller['Ts_clone'].mean()
 
-
-num_repeats = 1
 parameters_list = [
     "lambda_d", "lambda_s", "delta",
     *["beta_d" + str(i) for i in range(9)],
     *["beta_s" + str(i) for i in range(9)]
 ]
 
-# Créer un DataFrame avec la colonne "parameters" et la colonne "valeurs"
-data = {"parameters": parameters_list, "valeurs": [0] * len(parameters_list)}
-all_estimations = []
-liste_compteur = []
 # Répéter le calcul de la minimisation
 initial_params = np.random.uniform(1, 5, size=21)
 result = minimize(likelihood, initial_params, method='BFGS', options={'maxiter': 1000, 'disp': True, 'ftol': 1e-1})
@@ -166,6 +157,9 @@ parameters_list = [
 covariance_matrix = np.linalg.inv(hessian)
 std_deviations = np.sqrt(np.diag(covariance_matrix))
 #print("Écarts types des estimateurs :", std_deviations)
+print("Paramètres initiaux : ", initial_params)
+print(success)
+print(message)
 
 for i, param in enumerate(estimated_params):
     print(parameters_list[i], " : ", param, "     std : ", std_deviations[i])
