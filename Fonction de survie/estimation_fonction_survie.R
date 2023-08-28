@@ -1001,8 +1001,4 @@ mph.vend2 <- emfrail(formula = Surv(time, status) ~ sexe_homme +
                                                   left_truncation = TRUE, 
                                                   basehaz = "exponential")) 
 mph.vend2
-
-
-
-rm(list = ls())
 ################################################################################################### 
