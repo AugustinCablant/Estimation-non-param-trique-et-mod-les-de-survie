@@ -46,13 +46,19 @@ def LSeller_i(lambda_d, lambda_s, phi_d, phi_s,delta, i):
     numerateur_s_exp = np.exp(-(phi_s[i] * IS(lambda_s,seller['Ts'][i])))
     numerateur_s = lambda_s * phi_s[i] * numerateur_s_exp
     numerateur = numerateur_d * numerateur_s
+
     # dénominateur 
     s = lambda_s * phi_s[i] 
     d = lambda_d * phi_d[i] 
     t_end = (seller['tau_end'][i] - seller['tau_birth'][i]) * facteur_de_normalisation
     t_begin = (seller['tau_begin'][i] - seller['tau_birth'][i]) * facteur_de_normalisation
     deno = d * (1 - delta) + s
-    membre_1 = - (s * (np.exp( - d * (delta * t_end - (1 - delta) * t_begin ) - s * t_begin) - np.exp(- t_begin * (d + s)))) / deno
+
+    # on multiplie par -1
+    membre_1 = (np.exp(- delta * d * t_end) - 
+                  np.exp(- delta * d * t_begin) + 
+                  np.exp(- t_begin * (d + s)) -
+                  np.exp(- delta * d * t_end - t_begin * ((1 - delta) * d + s))) / deno
     membre_2 = np.exp( - t_end * (d + s)) - np.exp( - d * t_begin - s * t_end)
     membre_3 = np.exp(- d * t_begin - s * t_end) - np.exp( - t_end * (d + s)) - s * (np.exp(- d * (delta * t_end - (1 - delta) * t_begin ) - s * t_begin ) - np.exp( - t_end * (s + d))) / deno    
     denominateur = membre_1 + membre_2 + membre_3
@@ -74,7 +80,13 @@ def LClone_i(lambda_d, lambda_s, phi_d, phi_s,delta, i):
     t_end = (seller['tau_end'][i] - seller['tau_birth'][i]) * facteur_de_normalisation
     t_begin = (seller['tau_contract'][i] - seller['tau_birth'][i]) * facteur_de_normalisation
     deno = d * (1 - delta) + s
-    membre_1 = - (s * (np.exp( - d * (delta * t_end - (1 - delta) * t_begin ) - s * t_begin) - np.exp(- t_begin * (d + s)))) / deno
+
+    #on multiplie aussi par -1
+    membre_1 = (np.exp(- delta * d * t_end) - 
+                  np.exp(- delta * d * t_begin) + 
+                  np.exp(- t_begin * (d + s)) -
+                  np.exp(- delta * d * t_end - t_begin * ((1 - delta) * d + s))) / deno
+    membre_2 = np.exp( - t_end * (d + s)) - np.exp( - d * t_begin - s * t_end)
     membre_2 = np.exp( - t_end * (d + s)) - np.exp( - d * t_begin - s * t_end)
     membre_3 = np.exp(- d * t_begin - s * t_end) - np.exp( - t_end * (d + s)) - s * (np.exp(- d * (delta * t_end - (1 - delta) * t_begin ) - s * t_begin ) - np.exp( - t_end * (s + d))) / deno
     denominateur = membre_1 + membre_2 + membre_3
@@ -110,12 +122,10 @@ def likelihood(parameters):
     L_clone_sum = 0
     # Il faut 2000 observations 
     for i in tqdm(seller.index.to_list()): 
-        Log_seller = vlog_negatif(LSeller_i(lambda_d, lambda_s, phi_d, phi_s,delta, i))
-        Log_clone = vlog_negatif(LClone_i(lambda_d, lambda_s, phi_d, phi_s,delta, i))
-        if Log_seller != np.inf and Log_clone != np.inf and Log_seller != - np.inf and Log_clone != - np.inf: 
-            if Log_seller != np.nan and Log_clone != np.nan and Log_seller != None and Log_clone != None:
-                L_seller_sum = L_seller_sum + Log_seller
-                L_clone_sum = L_clone_sum + Log_clone
+        Log_seller = LSeller_i(lambda_d, lambda_s, phi_d, phi_s,delta, i)
+        Log_clone = LClone_i(lambda_d, lambda_s, phi_d, phi_s,delta, i)
+        L_seller_sum = L_seller_sum + Log_seller
+        L_clone_sum = L_clone_sum + Log_clone
     # Log_vraisemblance
     L_1 = np.sum(L_seller_sum)
     L_2 = np.sum(L_clone_sum)
