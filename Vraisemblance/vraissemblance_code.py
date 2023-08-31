@@ -8,7 +8,7 @@ from tqdm import tqdm
 from prettytable import PrettyTable
 
 seller = pd.read_csv('Data/dataset_vraissemblance.csv')
-facteur_de_normalisation = 10 ** (-5)
+facteur_de_normalisation = 10 ** (-6)
 
 X = ['sexe_femme','idf','etranger','dec1','dec2','dec3']
 columns = ['sexe_femme','idf','etranger','dec1','dec2','dec3','tau_birth','tau_contract','Td','Ts','Td_clone','Ts_clone','tau_begin','tau_end']
@@ -55,12 +55,15 @@ def LSeller_i(lambda_d, lambda_s, phi_d, phi_s,delta, i):
     deno = d * (1 - delta) + s
 
     # on multiplie par -1
-    membre_1 = (np.exp(- delta * d * t_end) - 
+    membre_1 =  s * (np.exp(- delta * d * t_end) - 
                   np.exp(- delta * d * t_begin) + 
                   np.exp(- t_begin * (d + s)) -
                   np.exp(- delta * d * t_end - t_begin * ((1 - delta) * d + s))) / deno
     membre_2 = np.exp( - t_end * (d + s)) - np.exp( - d * t_begin - s * t_end)
-    membre_3 = np.exp(- d * t_begin - s * t_end) - np.exp( - t_end * (d + s)) - s * (np.exp(- d * (delta * t_end - (1 - delta) * t_begin ) - s * t_begin ) - np.exp( - t_end * (s + d))) / deno    
+    membre_3_1 = np.exp(- d * t_begin - s * t_end) - np.exp( - t_end * (d + s)) 
+    membre_3_2 = s * (np.exp(- d * (delta * t_end - (1 - delta) * t_begin ) - s * t_begin ) - np.exp( - t_end * (s + d))) / deno
+    membre_3 = membre_3_1 + membre_3_2
+                                               
     denominateur = membre_1 + membre_2 + membre_3
     resultat = numerateur / denominateur
     
@@ -82,13 +85,14 @@ def LClone_i(lambda_d, lambda_s, phi_d, phi_s,delta, i):
     deno = d * (1 - delta) + s
 
     #on multiplie aussi par -1
-    membre_1 = (np.exp(- delta * d * t_end) - 
+    membre_1 = - s * (np.exp(- delta * d * t_end) - 
                   np.exp(- delta * d * t_begin) + 
                   np.exp(- t_begin * (d + s)) -
                   np.exp(- delta * d * t_end - t_begin * ((1 - delta) * d + s))) / deno
     membre_2 = np.exp( - t_end * (d + s)) - np.exp( - d * t_begin - s * t_end)
-    membre_2 = np.exp( - t_end * (d + s)) - np.exp( - d * t_begin - s * t_end)
-    membre_3 = np.exp(- d * t_begin - s * t_end) - np.exp( - t_end * (d + s)) - s * (np.exp(- d * (delta * t_end - (1 - delta) * t_begin ) - s * t_begin ) - np.exp( - t_end * (s + d))) / deno
+    membre_3_1 = np.exp(- d * t_begin - s * t_end) - np.exp( - t_end * (d + s)) 
+    membre_3_2 = s * (np.exp(- d * (delta * t_end - (1 - delta) * t_begin ) - s * t_begin ) - np.exp( - t_end * (s + d))) / deno
+    membre_3 = membre_3_1 + membre_3_2
     denominateur = membre_1 + membre_2 + membre_3
     
     resultat = numerateur / denominateur
