@@ -98,7 +98,6 @@ def likelihood(parameters):
     beta_d = list(parameters[2:8])
     beta_s = list(parameters[8:14])
     delta = parameters[-1]
-
     phi_d = phiD(beta_d) * facteur_de_normalisation
     phi_s = phiS(beta_s) * facteur_de_normalisation
     L_seller_sum = 0
