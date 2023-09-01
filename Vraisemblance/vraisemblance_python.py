@@ -84,6 +84,7 @@ def LClone_i(lambda_d, lambda_s, phi_d, phi_s,delta, i):
         - (np.exp(- d * (delta * t_end - (1 - delta) * t_begin) - s * t_begin) + np.exp(- t_end * (d + s)))  #début de (2)
         ) / deno + np.exp(- t_begin * (d + s)) - np.exp(- t_begin * d - t_end * s) + np.exp(
         - t_begin * d - t_end * s) - np.exp(- t_end * (d + s))  #(3)
+    print(numerateur / denominateur, numerateur, denominateur, d, s, deno, t_end, t_begin)
     return numerateur / denominateur
 
 #fonction de vraissemblance
@@ -119,7 +120,7 @@ seller['Td_clone'] = seller['Td_clone'] * facteur_de_normalisation
 seller['Ts_clone'] = seller['Ts_clone'] * facteur_de_normalisation
 
 #minimisation de l'opposé de la log-vraisemblance
-initial_params = np.random.uniform(1, 3, size=15)
+initial_params = np.random.uniform(2, 4, size=15)
 result = minimize(likelihood, initial_params, method='BFGS', options={'disp': True, 'max_iter' : 1000})
 estimated_params = result.x
 success = result.success
