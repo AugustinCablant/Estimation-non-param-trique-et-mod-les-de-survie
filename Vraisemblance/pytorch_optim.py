@@ -1,7 +1,8 @@
 #Imports
 import numpy as np 
 import pandas as pd 
-from scipy.optimize import minimize
+import torch
+import torch.optim as optim
 from tqdm import tqdm
 
 #Charger les données
@@ -96,6 +97,7 @@ def likelihood(parameters):
     # Paramètres à trouver
     # lambda_d, lambda_s et delta des réels 
     # beta_d et beta_s des vecteurs de taille 6
+    parameters = parameters.detach().numpy()
     parameters = list(parameters)
     lambda_d = parameters[0]
     lambda_s = parameters[1]
@@ -123,26 +125,33 @@ seller['Td_clone'] = seller['Td_clone'] * facteur_de_normalisation
 seller['Ts_clone'] = seller['Ts_clone'] * facteur_de_normalisation
 
 #minimisation de l'opposé de la log-vraisemblance
-initial_params = np.random.uniform(2, 4, size=15)
-result = minimize(likelihood, initial_params, method='L-BFGS-B', options={'disp': True})
-estimated_params = result.x
-success = result.success
-message = result.message
-hessian = result.hess_inv
+lambda_d0 = np.random.uniform(1, 4, size=1)
+lambda_s0 = np.random.uniform(1, 4, size=1)
+beta_d0_1 = np.random.uniform(1, 4, size=1)
+beta_d0_2 = np.random.uniform(1, 4, size=1)
+beta_d0_3 = np.random.uniform(1, 4, size=1)
+beta_d0_4 = np.random.uniform(1, 4, size=1)
+beta_d0_5 = np.random.uniform(1, 4, size=1)
+beta_d0_6 = np.random.uniform(1, 4, size=1)
+beta_s0_1 = np.random.uniform(1, 4, size=1)
+beta_s0_2 = np.random.uniform(1, 4, size=1)
+beta_s0_3 = np.random.uniform(1, 4, size=1)
+beta_s0_4 = np.random.uniform(1, 4, size=1)
+beta_s0_5 = np.random.uniform(1, 4, size=1)
+beta_s0_6 = np.random.uniform(1, 4, size=1)
+delta0 = np.random.uniform(1, 4, size=1)
+params = [lambda_d0, lambda_s0, 
+          beta_d0_1, beta_d0_2, beta_d0_3, beta_d0_4, beta_d0_5, beta_d0_6,
+          beta_s0_1, beta_s0_2, beta_s0_3, beta_s0_4, beta_s0_5, beta_s0_6,
+          delta0]
+flattened_params = torch.cat([param.view(-1) for param in params], dim=0)
+optimizer = optim.Adam([params], lr=0.1)
 
-# Calculer les écarts types des estimateurs (racine carrée des variances diagonales)
-covariance_matrix = np.linalg.inv(hessian)
-std_deviations = np.sqrt(np.diag(covariance_matrix))
+for epoch in tqdm(range(10)):
+    optimizer.zero_grad()  #Réinitialiser les gradients à zéro
+    loss = likelihood(params)  #Calculer la valeur de la fonction d'objectif
+    loss.backward()  #Calculer les gradients
+    optimizer.step()  #Mettre à jour les paramètres
 
-print("Paramètres initiaux : ", initial_params)
-print(success)
-print(message)
-
-#afficher les paramètres
-parameters_list = [
-    "lambda_d", "lambda_s", "delta",
-    *["beta_d" + str(i) for i in range(6)],
-    *["beta_s" + str(i) for i in range(6)]
-    ]
-for i, param in enumerate(estimated_params):
-    print(parameters_list[i], " : ", param, "     std : ", std_deviations[i])
+optimal_params = [param.detach().numpy() for param in params]
+print(optimal_params)
