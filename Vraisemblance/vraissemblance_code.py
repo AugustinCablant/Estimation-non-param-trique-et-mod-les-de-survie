@@ -11,7 +11,8 @@ seller = pd.read_csv('Data/dataset_vraissemblance.csv')
 facteur_de_normalisation = 10 ** (-6)
 
 X = ['sexe_femme','idf','etranger','dec1','dec2','dec3']
-columns = ['sexe_femme','idf','etranger','dec1','dec2','dec3','tau_birth','tau_contract','Td','Ts','Td_clone','Ts_clone','tau_begin','tau_end']
+columns = ['sexe_femme','idf','etranger','dec1','dec2','dec3','tau_birth','tau_contract',
+           'Td','Ts','Td_clone','Ts_clone','tau_begin','tau_end']
 
 ### Quelques fonctions utiles ###
 def phiD(beta_d): 
