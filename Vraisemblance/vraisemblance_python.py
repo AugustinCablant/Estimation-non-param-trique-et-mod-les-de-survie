@@ -77,14 +77,13 @@ def LClone_i(lambda_d, lambda_s, phi_d, phi_s,delta, i):
     t_end = (seller['tau_end'][i] - seller['tau_birth'][i]) * facteur_de_normalisation
     t_begin = (seller['tau_contract'][i] - seller['tau_birth'][i]) * facteur_de_normalisation
 
-    numerateur = d * np.exp(- phi_d[i] * ID(lambda_d, seller['Td_clone'][i])) * s * np.exp(
+    numerateur = d * np.exp(- phi_d[i] * ID(lambda_d, seller['Td_clone'][i])) * np.exp(
     - phi_s[i] * IS(lambda_s, seller['Td_clone'][i]))
     denominateur = s * (np.exp(- delta * d * t_begin) - np.exp(- delta * d * t_end) + np.exp(
         - delta * d * t_end - t_begin * ((1 - delta) * d + s)) - np.exp( - t_begin * (d + s))  #(1)
         - (np.exp(- d * (delta * t_end - (1 - delta) * t_begin) - s * t_begin) + np.exp(- t_end * (d + s)))  #début de (2)
         ) / deno + np.exp(- t_begin * (d + s)) - np.exp(- t_begin * d - t_end * s) + np.exp(
         - t_begin * d - t_end * s) - np.exp(- t_end * (d + s))  #(3)
-    print(numerateur / denominateur, numerateur, denominateur, d, s, deno, t_end, t_begin)
     return numerateur / denominateur
 
 #fonction de vraissemblance
