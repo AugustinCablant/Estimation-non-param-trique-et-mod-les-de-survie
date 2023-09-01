@@ -124,7 +124,7 @@ seller['Ts_clone'] = seller['Ts_clone'] * facteur_de_normalisation
 
 #minimisation de l'opposé de la log-vraisemblance
 initial_params = np.random.uniform(2, 4, size=15)
-result = minimize(likelihood, initial_params, method='L-BFGS-B', options={'disp': True})
+result = minimize(likelihood, initial_params, method='BFGS', options={'disp': True, 'tol': 1e-2})
 estimated_params = result.x
 success = result.success
 message = result.message
