@@ -131,8 +131,8 @@ def likelihood(parameters):
     L_seller_sum = 0
     L_clone_sum = 0
     for i in tqdm(seller.index.to_list()): 
-        Log_seller_i = log_negatif(LSeller_i(lambda_d, lambda_s, phi_d, phi_s, delta, i))
-        Log_clone_i = log_negatif(LClone_i(lambda_d, lambda_s, phi_d, phi_s, delta, i))
+        Log_seller_i = np.log(LSeller_i(lambda_d, lambda_s, phi_d, phi_s, delta, i))
+        Log_clone_i = np.log(LClone_i(lambda_d, lambda_s, phi_d, phi_s, delta, i))
         L_seller_sum = L_seller_sum + Log_seller_i
         L_clone_sum = L_clone_sum + Log_clone_i
     Likelihood = L_seller_sum + L_clone_sum 
@@ -150,7 +150,7 @@ seller['Ts_clone'] = seller['Ts_clone'] * facteur_de_normalisation
 initial_params = np.array([1 / td_mean, 1 / ts_mean, 1,
                            -0.5, 0, 0, 0, 0, 0,
                            -0.5, 0, 0, 0, 0, 0])
-result = minimize(likelihood, initial_params, method='Nelder-Mead', options={'disp': True, 'tol': 1e-1, 'maxiter': 100000})
+result = minimize(likelihood, initial_params, method='Nelder-Mead', options={'disp': True, 'tol': 1e-1, 'maxiter': 50000})
 estimated_params = result.x
 success = result.success
 message = result.message
