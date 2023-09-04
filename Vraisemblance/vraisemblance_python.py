@@ -131,6 +131,7 @@ def likelihood(parameters):
     L_seller_sum = 0
     L_clone_sum = 0
     for i in tqdm(seller.index.to_list()): 
+        print(LSeller_i(lambda_d, lambda_s, phi_d, phi_s, delta, i))
         Log_seller_i = np.log(LSeller_i(lambda_d, lambda_s, phi_d, phi_s, delta, i))
         Log_clone_i = np.log(LClone_i(lambda_d, lambda_s, phi_d, phi_s, delta, i))
         L_seller_sum = L_seller_sum + Log_seller_i
