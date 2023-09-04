@@ -2,11 +2,12 @@
 import numpy as np 
 import pandas as pd 
 from scipy.optimize import minimize
+from scipy.integrate import quad
 from tqdm import tqdm
 
 #Charger les données
 seller = pd.read_csv('Data/dataset_vraissemblance.csv')
-facteur_de_normalisation = 10 ** (-4)
+facteur_de_normalisation = 10 ** (-3)
 
 #Colonnes que l'on utilise
 X = ['sexe_femme','idf','etranger','dec1','dec2','dec3']
@@ -60,12 +61,23 @@ def LSeller_i(lambda_d, lambda_s, phi_d, phi_s,delta, i):
 
     numerateur = delta * d * np.exp(- phi_d[i] * IDD(delta, lambda_d, seller['Td'][i], seller['Ts'][i])) * s * np.exp(
         - phi_s[i] * IS(lambda_s, seller['Ts'][i]))
-    denominateur = s * (np.exp(- delta * d * t_begin) - np.exp(- delta * d * t_end) + np.exp(
+    #calcul à la main
+    """
+    denominateur1 = s * (np.exp(- delta * d * t_begin) - np.exp(- delta * d * t_end) + np.exp(
         - delta * d * t_end - t_begin * ((1 - delta) * d + s)) - np.exp( - t_begin * (d + s))  #(1)
         - (np.exp(- d * (delta * t_end + (1 - delta) * t_begin) - s * t_begin) + np.exp(- t_end * (d + s)))  #début de (2)
         ) / deno + np.exp(- t_begin * (d + s)) - np.exp(- t_begin * d - t_end * s) + np.exp(
         - t_begin * d - t_end * s) - np.exp(- t_end * (d + s))  #(3)
-    return numerateur #/ denominateur
+    
+    #calcul numérique 
+    def integ(t):
+        integrande = (np.exp(- phi_d[i] * IDD(initial_params[2], initial_params[0], t_begin, t)) - np.exp(
+            - phi_d[i] * IDD(initial_params[2], initial_params[0], t_end, t))) * s * np.exp(
+                - phi_s[i] * IS(initial_params[1], t))
+        return integrande
+    denominateur2 = quad(integ, 0, 10000)[0]
+    """
+    return numerateur #/ denominateur2
 
 #contribution des clones 
 def LClone_i(lambda_d, lambda_s, phi_d, phi_s,delta, i):
@@ -84,12 +96,24 @@ def LClone_i(lambda_d, lambda_s, phi_d, phi_s,delta, i):
 
     numerateur = d * np.exp(- phi_d[i] * ID(lambda_d, seller['Td_clone'][i])) * np.exp(
     - phi_s[i] * IS(lambda_s, seller['Td_clone'][i]))
+
+    #calcul à la main
+    """
     denominateur = s * (np.exp(- delta * d * t_begin) - np.exp(- delta * d * t_end) + np.exp(
         - delta * d * t_end - t_begin * ((1 - delta) * d + s)) - np.exp( - t_begin * (d + s))  #(1)
         - (np.exp(- d * (delta * t_end + (1 - delta) * t_begin) - s * t_begin) + np.exp(- t_end * (d + s)))  #début de (2)
         ) / deno + np.exp(- t_begin * (d + s)) - np.exp(- t_begin * d - t_end * s) + np.exp(
         - t_begin * d - t_end * s) - np.exp(- t_end * (d + s))  #(3)
-    return numerateur #/ denominateur
+    
+    #calcul numérique 
+    def integ(t):
+        integrande = (np.exp(- phi_d[i] * IDD(initial_params[2], initial_params[0], t_begin, t)) - np.exp(
+            - phi_d[i] * IDD(initial_params[2], initial_params[0], t_end, t))) * s * np.exp(
+                - phi_s[i] * IS(initial_params[1], t))
+        return integrande
+    denominateur2 = quad(integ, 0, 10000)[0]
+    """
+    return numerateur #/ denominateur2
 
 #fonction de vraissemblance
 def likelihood(parameters):
@@ -102,8 +126,8 @@ def likelihood(parameters):
     delta = parameters[3]
     beta_d = list(parameters[3:9])
     beta_s = list(parameters[9:15])
-    phi_d = phiD(beta_d) * facteur_de_normalisation
-    phi_s = phiS(beta_s) * facteur_de_normalisation
+    phi_d = phiD(beta_d) 
+    phi_s = phiS(beta_s) 
     L_seller_sum = 0
     L_clone_sum = 0
     for i in tqdm(seller.index.to_list()): 
@@ -111,9 +135,7 @@ def likelihood(parameters):
         Log_clone_i = log_negatif(LClone_i(lambda_d, lambda_s, phi_d, phi_s, delta, i))
         L_seller_sum = L_seller_sum + Log_seller_i
         L_clone_sum = L_clone_sum + Log_clone_i
-    L_1 = np.sum(L_seller_sum)
-    L_2 = np.sum(L_clone_sum)
-    Likelihood = L_1 + L_2
+    Likelihood = L_seller_sum + L_clone_sum 
     return - Likelihood
 
 # Réduire l'ordre de grandeur des variables
@@ -128,11 +150,11 @@ seller['Ts_clone'] = seller['Ts_clone'] * facteur_de_normalisation
 initial_params = np.array([1 / td_mean, 1 / ts_mean, 1,
                            -0.5, 0, 0, 0, 0, 0,
                            -0.5, 0, 0, 0, 0, 0])
-result = minimize(likelihood, initial_params, method='L-BFGS-B', options={'disp': True, 'tol': 1e-2})
+result = minimize(likelihood, initial_params, method='Nelder-Mead', options={'disp': True, 'tol': 1e-1, 'maxiter': 100000})
 estimated_params = result.x
 success = result.success
 message = result.message
-hessian = result.hess_inv
+#hessian = result.hess_inv
 
 print("Paramètres initiaux : ", initial_params)
 print(success)
@@ -145,9 +167,4 @@ parameters_list = [
     *["beta_s" + str(i) for i in range(6)]
     ]
 for i, param in enumerate(estimated_params):
-    print(parameters_list[i], " : ", param) #, "     std : ", std_deviations[i])
-
-# Calculer les écarts types des estimateurs (racine carrée des variances diagonales)
-covariance_matrix = np.linalg.inv(hessian)
-std_deviations = np.sqrt(np.diag(covariance_matrix))
-print(std_deviations)
+    print(parameters_list[i], " : ", param)

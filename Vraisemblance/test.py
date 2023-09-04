@@ -1,6 +1,7 @@
 import numpy as np 
 import pandas as pd 
 from scipy.optimize import minimize
+from scipy.integrate import quad
 
 #Charger les données
 seller = pd.read_csv('Data/dataset_vraissemblance.csv')
@@ -43,14 +44,17 @@ def IS(lambda_s,t):
     I = lambda_s * t
     return I 
 
+"""
 #Contribution du vendeur 
 def LSeller_i(lambda_d, lambda_s, phi_d, phi_s,delta, i):
     """
+"""
     lambda_d / lambda_s / delta des scalaires 
     phi_d / phi_s des vecteurs
     i correspond au ième vendeur  
     cette fonction retourne la contribution du ième vendeur à la fonction de vraisemblance  
     """
+"""
     #quelques variables pour rendre visible les calculs
     d = lambda_d * phi_d[i]
     s = lambda_s * phi_s[i]
@@ -71,11 +75,13 @@ def LSeller_i(lambda_d, lambda_s, phi_d, phi_s,delta, i):
 #contribution des clones 
 def LClone_i(lambda_d, lambda_s, phi_d, phi_s,delta, i):
     """
+"""
     lambda_d / lambda_s / delta des scalaires 
     phi_d / phi_s des vecteurs
     i correspond au ième vendeur  
     cette fonction retourne la contribution du ième clone à la fonction de vraisemblance  
     """
+"""
     #quelques variables pour rendre visible les calculs
     d = lambda_d * phi_d[i]
     s = lambda_s * phi_s[i]
@@ -91,21 +97,28 @@ def LClone_i(lambda_d, lambda_s, phi_d, phi_s,delta, i):
         ) / deno + np.exp(- t_begin * (d + s)) - np.exp(- t_begin * d - t_end * s) + np.exp(
         - t_begin * d - t_end * s) - np.exp(- t_end * (d + s))  #(3)
     return numerateur / denominateur
+"""
+td_mean = (seller['Td'].mean() + seller['Td_clone'].mean()) / 2
+ts_mean = seller['Ts'].mean()
+seller['Ts'] = seller['Ts'] * facteur_de_normalisation
+seller['Td'] = seller['Td'] * facteur_de_normalisation
+seller['Td_clone'] = seller['Td_clone'] * facteur_de_normalisation
+seller['Ts_clone'] = seller['Ts_clone'] * facteur_de_normalisation
 
-parameter = np.random.uniform(2, 4, size=15)
-parameters = list(parameter)
-lambda_d = parameters[0]
-lambda_s = parameters[1]
-beta_d = list(parameters[2:8])
-beta_s = list(parameters[8:14])
-delta = parameters[-1]
-phi_d = phiD(beta_d) * facteur_de_normalisation
-phi_s = phiS(beta_s) * facteur_de_normalisation
+initial_params = np.array([1 / td_mean, 1 / ts_mean, 1,
+                           -0.5, 0, 0, 0, 0, 0,
+                           -0.5, 0, 0, 0, 0, 0])
+phi_d = phiD(initial_params[3:9])
+phi_s = phiD(initial_params[9:15])
 
-def log_negatif(x):
-    if x > 0: return np.log(x)
-    elif x <= 0: return -np.log(-x)
-vlog_negatif = np.vectorize(log_negatif)
-
-for i in seller.index.to_list(): 
-    print(i, LSeller_i(lambda_d, lambda_s, phi_d, phi_s, delta, i), vlog_negatif(LSeller_i(lambda_d, lambda_s, phi_d, phi_s, delta, i)))
+for i in seller.index.to_list():
+    d = initial_params[0] * phi_d[i]
+    s = initial_params[1] * phi_s[i]
+    t_begin = (seller['tau_begin'][i] - seller['tau_birth'][i]) * facteur_de_normalisation
+    t_end = (seller['tau_end'][i] - seller['tau_birth'][i]) * facteur_de_normalisation
+    def integ(t):
+        integrande = (np.exp(- phi_d[i] * IDD(initial_params[2], initial_params[0], t_begin, t)) - np.exp(
+            - phi_d[i] * IDD(initial_params[2], initial_params[0], t_end, t))) * s * np.exp(
+                - phi_s[i] * IS(initial_params[1], t))
+        return integrande
+    print(quad(integ, 0, 10000)[0])
