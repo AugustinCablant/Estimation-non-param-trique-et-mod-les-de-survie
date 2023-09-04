@@ -8,7 +8,6 @@ from tqdm import tqdm
 #Charger les données
 seller = pd.read_csv('Data/dataset_vraissemblance.csv')
 facteur_de_normalisation = 10 ** (-3)
-
 #Colonnes que l'on utilise
 X = ['sexe_femme','idf','etranger','dec1','dec2','dec3']
 columns = ['sexe_femme','idf','etranger','dec1','dec2','dec3','tau_birth','tau_contract',
@@ -148,7 +147,7 @@ seller['Ts_clone'] = seller['Ts_clone'] * facteur_de_normalisation
 initial_params = np.array([1 / td_mean, 1 / ts_mean, 1,
                            -0.5, 0, 0, 0, 0, 0,
                            -0.5, 0, 0, 0, 0, 0])
-result = minimize(likelihood, initial_params, method='Nelder-Mead', options={'disp': True, 'tol': 1e-1, 'maxiter': 50000})
+result = minimize(likelihood, initial_params, method='Nelder-Mead', options={'disp': True, 'tol': 1e-6, 'maxiter': 50000})
 estimated_params = result.x
 success = result.success
 message = result.message
