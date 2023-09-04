@@ -58,7 +58,6 @@ def LSeller_i(lambda_d, lambda_s, phi_d, phi_s,delta, i):
     deno = (1 - delta) * d + s
     t_end = (seller['tau_end'][i] - seller['tau_birth'][i]) * facteur_de_normalisation
     t_begin = (seller['tau_begin'][i] - seller['tau_birth'][i]) * facteur_de_normalisation
-
     numerateur = delta * d * np.exp(- phi_d[i] * IDD(delta, lambda_d, seller['Td'][i], seller['Ts'][i])) * s * np.exp(
         - phi_s[i] * IS(lambda_s, seller['Ts'][i]))
     #calcul à la main
@@ -123,7 +122,6 @@ def likelihood(parameters):
     lambda_d = parameters[0]
     lambda_s = parameters[1]
     delta = parameters[2]
-    delta = parameters[3]
     beta_d = list(parameters[3:9])
     beta_s = list(parameters[9:15])
     phi_d = phiD(beta_d) 
