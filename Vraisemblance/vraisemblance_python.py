@@ -128,7 +128,7 @@ seller['Ts_clone'] = seller['Ts_clone'] * facteur_de_normalisation
 initial_params = np.array([1 / td_mean, 1 / ts_mean, 1,
                            -0.5, 0, 0, 0, 0, 0,
                            -0.5, 0, 0, 0, 0, 0])
-result = minimize(likelihood, initial_params, method='L-BFGS-B', options={'disp': True, 'tol': 1e-6})
+result = minimize(likelihood, initial_params, method='L-BFGS-B', options={'disp': True, 'tol': 1e-2})
 estimated_params = result.x
 success = result.success
 message = result.message
@@ -145,8 +145,9 @@ parameters_list = [
     *["beta_s" + str(i) for i in range(6)]
     ]
 for i, param in enumerate(estimated_params):
-    print(parameters_list[i], " : ", param, "     std : ", std_deviations[i])
+    print(parameters_list[i], " : ", param) #, "     std : ", std_deviations[i])
 
 # Calculer les écarts types des estimateurs (racine carrée des variances diagonales)
 covariance_matrix = np.linalg.inv(hessian)
 std_deviations = np.sqrt(np.diag(covariance_matrix))
+print(std_deviations)
