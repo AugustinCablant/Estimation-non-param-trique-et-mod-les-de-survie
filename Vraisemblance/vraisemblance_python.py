@@ -60,13 +60,13 @@ def LSeller_i(lambda_d, lambda_s, phi_d, phi_s,delta, i):
     numerateur = delta * d * np.exp(- phi_d[i] * IDD(delta, lambda_d, seller['Td'][i], seller['Ts'][i])) * s * np.exp(
         - phi_s[i] * IS(lambda_s, seller['Ts'][i]))
     #calcul à la main
-    """
-    denominateur1 = s * (np.exp(- delta * d * t_begin) - np.exp(- delta * d * t_end) + np.exp(
+    
+    denominateur = s * (np.exp(- delta * d * t_begin) - np.exp(- delta * d * t_end) + np.exp(
         - delta * d * t_end - t_begin * ((1 - delta) * d + s)) - np.exp( - t_begin * (d + s))  #(1)
         - (np.exp(- d * (delta * t_end + (1 - delta) * t_begin) - s * t_begin) + np.exp(- t_end * (d + s)))  #début de (2)
         ) / deno + np.exp(- t_begin * (d + s)) - np.exp(- t_begin * d - t_end * s) + np.exp(
         - t_begin * d - t_end * s) - np.exp(- t_end * (d + s))  #(3)
-    
+    """
     #calcul numérique 
     def integ(t):
         integrande = (np.exp(- phi_d[i] * IDD(initial_params[2], initial_params[0], t_begin, t)) - np.exp(
@@ -75,7 +75,7 @@ def LSeller_i(lambda_d, lambda_s, phi_d, phi_s,delta, i):
         return integrande
     denominateur2 = quad(integ, 0, 10000)[0]
     """
-    return numerateur #/ denominateur2
+    return numerateur / denominateur
 
 #contribution des clones 
 def LClone_i(lambda_d, lambda_s, phi_d, phi_s,delta, i):
@@ -96,13 +96,13 @@ def LClone_i(lambda_d, lambda_s, phi_d, phi_s,delta, i):
     - phi_s[i] * IS(lambda_s, seller['Td_clone'][i]))
 
     #calcul à la main
-    """
+    
     denominateur = s * (np.exp(- delta * d * t_begin) - np.exp(- delta * d * t_end) + np.exp(
         - delta * d * t_end - t_begin * ((1 - delta) * d + s)) - np.exp( - t_begin * (d + s))  #(1)
         - (np.exp(- d * (delta * t_end + (1 - delta) * t_begin) - s * t_begin) + np.exp(- t_end * (d + s)))  #début de (2)
         ) / deno + np.exp(- t_begin * (d + s)) - np.exp(- t_begin * d - t_end * s) + np.exp(
         - t_begin * d - t_end * s) - np.exp(- t_end * (d + s))  #(3)
-    
+    """
     #calcul numérique 
     def integ(t):
         integrande = (np.exp(- phi_d[i] * IDD(initial_params[2], initial_params[0], t_begin, t)) - np.exp(
@@ -110,8 +110,9 @@ def LClone_i(lambda_d, lambda_s, phi_d, phi_s,delta, i):
                 - phi_s[i] * IS(initial_params[1], t))
         return integrande
     denominateur2 = quad(integ, 0, 10000)[0]
+    
     """
-    return numerateur #/ denominateur2
+    return numerateur / denominateur
 
 #fonction de vraissemblance
 def likelihood(parameters):
@@ -144,20 +145,28 @@ seller['Td_clone'] = seller['Td_clone'] * facteur_de_normalisation
 seller['Ts_clone'] = seller['Ts_clone'] * facteur_de_normalisation
 
 #minimisation de l'opposé de la log-vraisemblance
-initial_params = np.array([1 / td_mean, 1 / ts_mean, 1,
+#paramètres initiaux : les paramètres optimaux dans le cas sans troncature
+initial_params = [6.04346613e-03, 6.31093146e-03, 2.05136335e+01,
+                9.45523846e-01,-5.76752473e-01, -4.21429986e-01, 3.89043616e-01, -3.58258201e-01,
+                -1.62128708e-01, 5.91413099e-01, 1.78948759e-01, -1.47719028e+00,
+                5.22530594e-01, 7.99081591e-01, 3.06774052e-02]
+
+"""
+#paramètres initiaux du cas sans troncature
+np.array([1 / td_mean, 1 / ts_mean, 1,
                            -0.5, 0, 0, 0, 0, 0,
                            -0.5, 0, 0, 0, 0, 0])
+"""
+#affichons les résultats:
 result = minimize(likelihood, initial_params, method='Nelder-Mead', options={'disp': True, 'tol': 1e-6, 'maxiter': 50000})
 estimated_params = result.x
 success = result.success
 message = result.message
-#hessian = result.hess_inv
 
 print("Paramètres initiaux : ", initial_params)
 print(success)
 print(message)
 
-#afficher les paramètres
 parameters_list = [
     "lambda_d", "lambda_s", "delta",
     *["beta_d" + str(i) for i in range(6)],
