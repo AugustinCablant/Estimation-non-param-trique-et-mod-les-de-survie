@@ -49,18 +49,23 @@ i) Estimation des **fonctions de survie** :
 
 ii) Pour l'**estimation des paramètres** dans le cadre le plus simple (on suppose que $var(V_d)=var(V_s)=0$ et $\delta(t,t_s,x)=\delta$). <br>
 
-$\theta_d(t|t_s,x)= \lambda_d \phi_d(x)$ si  $t \le t_s$ 
-$\theta_d(t|t_s,x)= \lambda_d \phi_d(x) \delta$ si $t >t_s$
-
-et
-
+$\theta_d(t|t_s,x)= \lambda_d \phi_d(x)$ si  $t \le t_s$ <br>
+$\theta_d(t|t_s,x)= \lambda_d \phi_d(x) \delta$ si $t >t_s$ <br>
 $\theta_s(t|x)=\lambda_s \phi_s(x).$
 
-On a donc fait l'hypothèse que l'hétérogénéité inobservée est absente et que les durées $T_d|T_s,X$ et $T_s|X$ suivent des lois exponentielles (les taux de hasard de base $\lambda_d(t)$ et $\lambda_s(t)$ ne dépendent pas de $t$). La contribution $L_i^{seller}$ s'écrit alors comme
-$L_{id}^{seller}&=\frac{f_d(t_{id}^{seller}|t_{is}^{seller},x_i)f_s(t_{is}^{seller}|x_i)}{Pr(\tau_{begin}<\tau_{i,birth}+T_{id}^{seller}<\tau_{end}|X_i=x_i)}\\
-&=\frac{f_d(t_{id}^{seller}|t_{is}^{seller},x_i)f_s(t_{is}^{seller}|x_i)}{\int \left[F_d(\tau_{end}-\tau_{i,birth}|t_s,x_i)-F_d(\tau_{begin}-\tau_{i,birth}|t_s,x_i) \right] f_s(t_s|x_i)dt_s} \\
-&=\frac{\lambda_d \phi_d(x_i) \delta e^{-\phi_d(x_i)I_d(t_{id}^{seller},t_{is}^{seller})} \lambda_s \phi_s(x_i) e^{-\phi_s(x_i)I_s(t_{is}^{seller})}}{\int \left[e^{-\phi_d(x_i)I_d(\tau_{begin}-\tau_{i,birth},t_s)}-e^{-\phi_d(x_i)I_d(\tau_{end}-\tau_{i,birth},t_s)}\right] \lambda_s \phi_s(x_i) e^{-\phi_s(x_i)I_s(t_s)} dt_s}$ et la contribution du clone s'écrit comme $L_i^{clone}&= \int_{t_{id}^{clone}} ^{\infty} \frac{f_d(t_{id}^{clone}|u,x_i)f_s(u|x_i)}{Pr(\tau_{contract}<\tau_{i,birth}+T_{id}^{seller}<\tau_{end}|X_i=x_i)}du \\
-&=\frac{\lambda_d \phi_d(x_i)e^{-\phi_d(x_i)I_d(t_{id}^{clone})}e^{-\phi_s(x_i)I_s(t_{id}^{clone})}}{\int \left[e^{-\phi_d(x_i)I_d(\tau_{contract}-\tau_{i,birth},t_s)}-e^{-\phi_d(x_i)I_d(\tau_{end}-\tau_{i,birth},t_s)}\right] \lambda_s \phi_s(x_i) e^{-\phi_s(x_i)I_s(t_s)} dt_s}.$
+On a donc fait l'hypothèse que l'hétérogénéité inobservée est absente et que les durées $T_d|T_s,X$ et $T_s|X$ suivent des lois exponentielles (les taux de hasard de base $\lambda_d(t)$ et $\lambda_s(t)$ ne dépendent pas de $t$). La contribution $L_i^{seller}$ s'écrit alors comme : 
+
+$L_{id}^{seller} = \frac{f_d(t_{id}^{seller}|t_{is}^{seller},x_i)f_s(t_{is}^{seller}|x_i)}{Pr(\tau_{begin}<\tau_{i,birth}+T_{id}^{seller}<\tau_{end}|X_i=x_i)}$ 
+
+$L_{id}^{seller} = \frac{f_d(t_{id}^{seller}|t_{is}^{seller},x_i)f_s(t_{is}^{seller}|x_i)}{\int \left[F_d(\tau_{end}-\tau_{i,birth}|t_s,x_i)-F_d(\tau_{begin}-\tau_{i,birth}|t_s,x_i) \right] f_s(t_s|x_i)dt_s}$ 
+
+$L_{id}^{seller} = \frac{\lambda_d \phi_d(x_i) \delta e^{-\phi_d(x_i)I_d(t_{id}^{seller},t_{is}^{seller})} \lambda_s \phi_s(x_i) e^{-\phi_s(x_i)I_s(t_{is}^{seller})}}{\int \left[e^{-\phi_d(x_i)I_d(\tau_{begin}-\tau_{i,birth},t_s)}-e^{-\phi_d(x_i)I_d(\tau_{end}-\tau_{i,birth},t_s)}\right] \lambda_s \phi_s(x_i) e^{-\phi_s(x_i)I_s(t_s)} dt_s}$ 
+
+et la contribution du clone s'écrit comme :
+
+$L_i^{clone} = \int_{t_{id}^{clone}} ^{\infty} \frac{f_d(t_{id}^{clone}|u,x_i)f_s(u|x_i)}{Pr(\tau_{contract}<\tau_{i,birth}+T_{id}^{seller}<\tau_{end}|X_i=x_i)}du$ 
+
+L_i^{clone} = \frac{\lambda_d \phi_d(x_i)e^{-\phi_d(x_i)I_d(t_{id}^{clone})}e^{-\phi_s(x_i)I_s(t_{id}^{clone})}}{\int \left[e^{-\phi_d(x_i)I_d(\tau_{contract}-\tau_{i,birth},t_s)}-e^{-\phi_d(x_i)I_d(\tau_{end}-\tau_{i,birth},t_s)}\right] \lambda_s \phi_s(x_i) e^{-\phi_s(x_i)I_s(t_s)} dt_s}.$
 
 Comme ci-dessus on spécifie $\phi_j(x_i)=exp(x_i'\beta_j)$, $j=d,s$, où $x_i'\beta_j=x_{i1}\beta_{j1}+x_{i2}\beta_{j2}+ ...+x_{iK}\beta_{jK}$, avec $K$ le nombre de variables explicatives.
 
