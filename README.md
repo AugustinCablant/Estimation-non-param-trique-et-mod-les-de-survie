@@ -58,9 +58,14 @@ Voici le lien vers le code : [estimation](https://github.com/AugustinCablant/Est
 Avec : 
 
 $\beta _{d0}$ (resp. $\beta _{s0}$) est le paramètre devant $1 _{\text{sexe femme}}$  
+
 $\beta _{d1}$ (resp. $\beta _{s1}$) est le paramètre devant $1 _{\text{idf}}$ 
+
 $\beta _{d2}$ (resp. $\beta _{s2}$) est le paramètre devant $1 _{\text{étranger}}$ 
+
 $\beta _{d3}$ (resp. $\beta _{s3}$) est le paramètre devant $1 _{\text{dec1}}$ 
+
 $\beta _{d4}$ (resp. $\beta _{s4}$) est le paramètre devant $1 _{\text{dec2}}$ 
+
 $\beta _{d5}$ (resp. $\beta _{s5}$) est le paramètre devant $1 _{\text{dec3}}$ 
 
