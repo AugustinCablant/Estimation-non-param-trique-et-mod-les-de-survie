@@ -55,11 +55,11 @@ $\theta_s(t|x)=\lambda_s \phi_s(x).$
 
 On a donc fait l'hypothèse que l'hétérogénéité inobservée est absente et que les durées $T_d|T_s,X$ et $T_s|X$ suivent des lois exponentielles (les taux de hasard de base $\lambda_d(t)$ et $\lambda_s(t)$ ne dépendent pas de $t$). La contribution $L_i^{seller}$ s'écrit alors comme : 
 
-$L_{id}^{seller} = \frac{f_d(t_{id}^{seller}|t_{is}^{seller},x_i)f_s(t_{is}^{seller}|x_i)}{Pr(\tau_{begin}<\tau_{i,birth}+T_{id}^{seller}<\tau_{end}|X_i=x_i)}$ 
+$L_{id}^{seller} = \frac{f_d(t_{id}^{seller}|t_{is}^{seller},x_i)f_s(t_{is}^{seller}|x_i)}P (\tau_{begin} < \tau_{i,birth} + T_{id}^{seller}< \tau_{end}|X_i=x_i)}$ 
 
-$L_{id}^{seller} = \frac{f_d(t_{id}^{seller}|t_{is}^{seller},x_i)f_s(t_{is}^{seller}|x_i)}{\int (F_d(\tau_{end}-\tau_{i,birth}|t_s,x_i)-F_d(\tau_{begin}-\tau_{i,birth}|t_s,x_i) ) f_s(t_s|x_i)dt_s}$ 
+$L_{id}^{seller} = \frac{f_d(t_{id}^{seller}|t_{is}^{seller},x_i)f_s(t_{is}^{seller}|x_i)}{\int (F_d( \tau_{end}-\tau_{i,birth}|t_s,x_i)-F_d( \tau_{begin} - \tau_{i,birth}|t_s,x_i) ) f_s(t_s|x_i)dt_s}$ 
 
-$L_{id}^{seller} = \frac{\lambda_d \phi_d(x_i) \delta e^{-\phi_d(x_i)I_d(t_{id}^{seller},t_{is}^{seller})} \lambda_s \phi_s(x_i) e^{-\phi_s(x_i)I_s(t_{is}^{seller})}}{\int \left[e^{-\phi_d(x_i)I_d(\tau_{begin}-\tau_{i,birth},t_s)}-e^{-\phi_d(x_i)I_d(\tau_{end}-\tau_{i,birth},t_s)}\right] \lambda_s \phi_s(x_i) e^{-\phi_s(x_i)I_s(t_s)} dt_s}$ 
+$L_{id}^{seller} = \frac{\lambda_d \phi_d(x_i) \delta e^{-\phi_d(x_i)I_d(t_{id}^{seller},t_{is}^{seller})} \lambda_s \phi_s(x_i) e^{-\phi_s(x_i)I_s(t_{is}^{seller})}}{\int (e^{-\phi_d(x_i)I_d(\tau_{begin}-\tau_{i,birth},t_s)}-e^{-\phi_d(x_i)I_d(\tau_{end}-\tau_{i,birth},t_s)}) \lambda_s \phi_s(x_i) e^{-\phi_s(x_i)I_s(t_s)} dt_s}$ 
 
 et la contribution du clone s'écrit comme :
 
