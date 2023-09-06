@@ -55,8 +55,7 @@ $\theta_s(t|x)=\lambda_s \phi_s(x).$
 
 On a donc fait l'hypothèse que l'hétérogénéité inobservée est absente et que les durées $T_d|T_s,X$ et $T_s|X$ suivent des lois exponentielles (les taux de hasard de base $\lambda_d(t)$ et $\lambda_s(t)$ ne dépendent pas de $t$). La contribution $L_i^{seller}$ s'écrit alors comme : 
 
-$L_{id}^{seller} =$ $\frac{f_d(t_{id}^{seller}|t_{is}^{seller},x_i).f_s(t_{is}^{seller}|x_i)}{P( \tau_{begin} < \tau_{i,birth} + T_{id} ^{seller} < 
- \tau_{end} |X_i=x_i)}$ 
+$L_{id}^{seller} = \frac{f_d(t_{id} ^{seller} | t_{is} ^{seller}, x_i) f_s(t_{is} ^{seller} | x_i)}{Pr( \tau _{begin} < \tau _{i,birth} | t_s, x_i) - F_d( \tau _{begin} - \tau _{i,birth} | t_s, x_i)) f_s(t_s|x_i) dt_s$
 
 $L_{id}^{seller} = \frac{f_d(t_{id}^{seller}|t_{is}^{seller},x_i)f_s(t_{is}^{seller}|x_i)}{\int (F_d( \tau_{end}-\tau_{i,birth}|t_s,x_i)-F_d( \tau_{begin} - \tau_{i,birth}|t_s,x_i) ) f_s(t_s|x_i)dt_s}$ 
 
