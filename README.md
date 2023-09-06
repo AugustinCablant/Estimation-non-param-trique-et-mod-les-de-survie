@@ -48,9 +48,17 @@ i) Estimation des **fonctions de survie** :
 </picture>
 
 ii) Pour l'**estimation des paramètres** dans le cadre le plus simple (on suppose que $var(V_d)=var(V_s)=0$ et $\delta(t,t_s,x)=\delta$). <br>
-Voici le lien vers le code : [estimation](https://github.com/AugustinCablant/Estimation-non-param-trique-et-mod-les-de-survie/blob/main/Vraissemblance/vraissemblance_code.py) 
+
+Voici le lien vers le code : [estimation](https://github.com/AugustinCablant/Estimation-non-param-trique-et-mod-les-de-survie/blob/main/Vraisemblance/vraisemblance_mod%C3%A8le_simple.py) 
 <picture>
  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/AugustinCablant/Estimation-non-param-trique-et-mod-les-de-survie/blob/main/Vraisemblance/resultats.png">
  <source media="(prefers-color-scheme: light)" srcset="https://github.com/AugustinCablant/Estimation-non-param-trique-et-mod-les-de-survie/blob/main/Vraisemblance/resultats.png">
  <img alt="Un rapide aperçu" src="https://github.com/AugustinCablant/Estimation-non-param-trique-et-mod-les-de-survie/blob/main/Vraisemblance/resultats.png">
 </picture>
+Avec : 
+$ \beta _{d0}$ (resp. $\beta _{s0}$) est le paramètre devant $1 _{\text{sexe femme}}$  
+$ \beta _{d1}$ (resp. $\beta _{s1}$) est le paramètre devant $1 _{\text{idf}}$ 
+$ \beta _{d2}$ (resp. $\beta _{s2}$) est le paramètre devant $1 _{\text{étranger}}$ 
+$ \beta _{d3}$ (resp. $\beta _{s3}$) est le paramètre devant $1 _{\text{dec1}}$ 
+$ \beta _{d4}$ (resp. $\beta _{s4}$) est le paramètre devant $1 _{\text{dec2}}$ 
+$ \beta _{d5}$ (resp. $\beta _{s5}$) est le paramètre devant $1 _{\text{dec3}}$ 
