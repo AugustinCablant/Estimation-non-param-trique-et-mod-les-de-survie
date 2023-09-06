@@ -127,6 +127,7 @@ def likelihood(parameters):
         L_seller_sum = L_seller_sum + Log_seller_i
         L_clone_sum = L_clone_sum + Log_clone_i
     Likelihood = L_seller_sum + L_clone_sum 
+    print(- Likelihood)
     return - Likelihood
 
 # Réduire l'ordre de grandeur des variables
