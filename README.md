@@ -65,7 +65,7 @@ et la contribution du clone s'écrit comme :
 
 $L_i^{clone} = \int_{t_{id}^{clone}} ^{\infty} \frac{f_d(t_{id}^{clone}|u,x_i)f_s(u|x_i)}{Pr(\tau_{contract}<\tau_{i,birth}+T_{id}^{seller}<\tau_{end}|X_i=x_i)}du$ 
 
-L_i^{clone} = \frac{\lambda_d \phi_d(x_i)e^{-\phi_d(x_i)I_d(t_{id}^{clone})}e^{-\phi_s(x_i)I_s(t_{id}^{clone})}}{\int ( e^{-\phi_d(x_i)I_d(\tau_{contract}-\tau_{i,birth},t_s)}-e^{-\phi_d(x_i)I_d(\tau_{end}-\tau_{i,birth},t_s)}) \lambda_s \phi_s(x_i) e^{-\phi_s(x_i)I_s(t_s)} dt_s}.$
+$L_i^{clone} = \frac{\lambda_d \phi_d(x_i)e^{-\phi_d(x_i)I_d(t_{id}^{clone})}e^{-\phi_s(x_i)I_s(t_{id}^{clone})}}{\int ( e^{-\phi_d(x_i)I_d(\tau_{contract}-\tau_{i,birth},t_s)}-e^{-\phi_d(x_i)I_d(\tau_{end}-\tau_{i,birth},t_s)}) \lambda_s \phi_s(x_i) e^{-\phi_s(x_i)I_s(t_s)} dt_s}.$
 
 Comme ci-dessus on spécifie $\phi_j(x_i)=exp(x_i'\beta_j)$, $j=d,s$, où $x_i'\beta_j=x_{i1}\beta_{j1}+x_{i2}\beta_{j2}+ ...+x_{iK}\beta_{jK}$, avec $K$ le nombre de variables explicatives.
 
