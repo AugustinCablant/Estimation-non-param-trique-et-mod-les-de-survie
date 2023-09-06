@@ -49,8 +49,8 @@ i) Estimation des **fonctions de survie** :
 
 ii) Pour l'**estimation des paramètres** dans le cadre le plus simple (on suppose que $var(V_d)=var(V_s)=0$ et $\delta(t,t_s,x)=\delta$). <br>
 
-$\theta_d(t|t_s,x)=\left\{\begin{array}{ll} \lambda_d \phi_d(x) \text{ si } t \le t_s\\ \lambda_d \phi_d(x) \delta \text{ si } t >t_s \end{array}
-\right.$
+$\theta_d(t|t_s,x)= \lambda_d \phi_d(x)$ si  $t \le t_s$ 
+$\theta_d(t|t_s,x)= \lambda_d \phi_d(x) \delta$ si $t >t_s$
 
 et
 
