@@ -59,6 +59,11 @@ def get_denominateur(alpha_d, alpha_s, sigma_d2,  sigma_s2, phi_d, phi_s, delta,
     intervalle2 = quad(integrande_denominateur, t_end, np.inf)[0]
     return intervalle1 + intervalle2
 
+params_history = []
+def callback(params):
+    params_history.append(params)
+
+
 #Contribution du vendeur 
 def LSeller_i(alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s,delta, i):
     """
@@ -140,14 +145,17 @@ seller['Ts_clone'] = seller['Ts_clone'] * facteur_de_normalisation
 
 #minimisation de l'opposé de la log-vraisemblance
 #paramètres optimaux dans le modèle simple
-initial_params = [random.uniform(-1, 0), random.uniform(-1, 0), random.uniform(1, 2), random.uniform(1, 2), 10.79241345, 
+initial_params = [random.uniform(-1, 0), random.uniform(-1, 0), random.uniform(1, 2), random.uniform(1, 2), random.uniform(0, 1), 
                   -0.2711224, 0.0436154, 0.04625169, 0.57186483, 0.1971254, 0.07792981, 
                   -0.38274347, 0.04600457, 0.02380623, 1.05678997,  0.45055338, 0.17921091]
 
-result = minimize(likelihood, initial_params, method='Nelder-Mead', options={'disp': True, 'tol': 1e-6, 'maxiter': 50000})
+result = minimize(likelihood, initial_params, callback=callback, method='Nelder-Mead', options={
+        'disp': True, 'tol': 1e-6, 'maxiter': 100})
 estimated_params = result.x
 success = result.success
 message = result.message
+print("Derniers paramètres trouvés :")
+print(params_history[-1])
 
 #calcul des écarts-types
 # Calculer la matrice de covariance des paramètres en utilisant une approximation numérique

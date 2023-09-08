@@ -136,6 +136,7 @@ def likelihood(parameters):
         L_seller_sum = L_seller_sum + Log_seller_i
         L_clone_sum = L_clone_sum + Log_clone_i
     Likelihood = L_seller_sum + L_clone_sum 
+    print(- Likelihood)
     return - Likelihood
 
 # Réduire l'ordre de grandeur des variables
@@ -148,20 +149,25 @@ seller['Ts_clone'] = seller['Ts_clone'] * facteur_de_normalisation
 
 #minimisation de l'opposé de la log-vraisemblance
 """
+#paramètres initiaux du cas sans troncature
+np.array([1 / td_mean, 1 / ts_mean, 1,
+                           -0.5, 0, 0, 0, 0, 0,
+                           -0.5, 0, 0, 0, 0, 0])
+
 #paramètres initiaux : les paramètres optimaux dans le cas sans troncature
 initial_params = [6.04346613e-03, 6.31093146e-03, 2.05136335e+01,
                 9.45523846e-01,-5.76752473e-01, -4.21429986e-01, 3.89043616e-01, -3.58258201e-01,
                 -1.62128708e-01, 5.91413099e-01, 1.78948759e-01, -1.47719028e+00,
                 5.22530594e-01, 7.99081591e-01, 3.06774052e-02]
+#optim 1
+initial_params = [0.0257828, 0.0142333, 10.79241345, -0.2711224, 0.0436154, 0.04625169, 0.57186483, 
+                  0.1971254, 0.07792981, -0.38274347, 0.04600457, 0.02380623, 1.05678997,  0.45055338, 0.17921091]  
 """
-initial_params = [0.0257828, 0.0142333, 0, -0.2711224, 0.0436154, 0.04625169, 0.57186483, 
-                  0.1971254, 0.07792981, -0.38274347, 0.04600457, 0.02380623, 1.05678997,  0.45055338, 0.17921091]
-"""
-#paramètres initiaux du cas sans troncature
-np.array([1 / td_mean, 1 / ts_mean, 1,
-                           -0.5, 0, 0, 0, 0, 0,
-                           -0.5, 0, 0, 0, 0, 0])
-"""
+initial_params = [6.04346613e-03, 6.31093146e-03, 10.79241345, 9.45523846e-01,-5.76752473e-01, -4.21429986e-01, 3.89043616e-01, 
+                  -3.58258201e-01, -1.62128708e-01, 5.91413099e-01, 1.78948759e-01, -1.47719028e+00, 5.22530594e-01, 
+                  7.99081591e-01, 3.06774052e-02]
+
+
 result = minimize(likelihood, initial_params, method='Nelder-Mead', options={'disp': True, 'tol': 1e-6, 'maxiter': 50000})
 estimated_params = result.x
 success = result.success
