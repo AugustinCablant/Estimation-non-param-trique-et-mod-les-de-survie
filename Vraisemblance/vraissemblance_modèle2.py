@@ -59,11 +59,6 @@ def get_denominateur(alpha_d, alpha_s, sigma_d2,  sigma_s2, phi_d, phi_s, delta,
     intervalle2 = quad(integrande_denominateur, t_end, np.inf)[0]
     return intervalle1 + intervalle2
 
-params_history = []
-def callback(params):
-    params_history.append(params)
-
-
 #Contribution du vendeur 
 def LSeller_i(alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s,delta, i):
     """
@@ -145,44 +140,15 @@ seller['Ts_clone'] = seller['Ts_clone'] * facteur_de_normalisation
 
 #minimisation de l'opposé de la log-vraisemblance
 #paramètres optimaux dans le modèle simple
-initial_params = [random.uniform(-1, 0), random.uniform(-1, 0), random.uniform(1, 2), random.uniform(1, 2), random.uniform(0, 1), 
-                  -0.2711224, 0.0436154, 0.04625169, 0.57186483, 0.1971254, 0.07792981, 
-                  -0.38274347, 0.04600457, 0.02380623, 1.05678997,  0.45055338, 0.17921091]
+initial_params = [-0.34424888965009215, -0.49280408089505745, 0.002994874532042946, 1.982782380814998, 0.3690313874659533, 
+                  -0.26802444043059415, 0.05848169036795936, 0.05372096134726763, 0.6703999999411836, 0.1448369355891595, 0.08531945569799503, 
+                  -0.4298036382553527, 0.04911358820730393, 0.022361765725589313, 1.065760759400694,  0.4874424897141275, 0.19645908908126325]
 
-result = minimize(likelihood, initial_params, callback=callback, method='Nelder-Mead', options={
-        'disp': True, 'tol': 1e-6, 'maxiter': 100})
+result = minimize(likelihood, initial_params, method='Nelder-Mead', options={
+        'disp': True, 'tol': 1e-2, 'maxiter': 300})
 estimated_params = result.x
 success = result.success
 message = result.message
-print("Derniers paramètres trouvés :")
-print(params_history[-1])
-
-#calcul des écarts-types
-# Calculer la matrice de covariance des paramètres en utilisant une approximation numérique
-epsilon = 1e-5  # Petit epsilon pour calculer les dérivées numériques
-num_params = len(initial_params)
-covariance_matrix = np.zeros((num_params, num_params))
-
-for i in range(num_params):
-    for j in range(num_params):
-        # Calculez les dérivées partielles numériques
-        params_plus_epsilon = np.array(estimated_params)
-        params_plus_epsilon[i] += epsilon
-        params_plus_epsilon[j] += epsilon
-
-        params_minus_epsilon = np.array(estimated_params)
-        params_minus_epsilon[i] -= epsilon
-        params_minus_epsilon[j] -= epsilon
-
-        # Calculez les gradients numériques
-        grad_plus = (likelihood(params_plus_epsilon) - result.fun) / epsilon
-        grad_minus = (likelihood(params_minus_epsilon) - result.fun) / epsilon
-
-        # Remplissez la matrice de covariance
-        covariance_matrix[i, j] = (grad_plus * grad_minus)
-
-# Calculez les écarts-types des paramètres à partir de la matrice de covariance
-parameter_std_devs = np.sqrt(np.diag(covariance_matrix))
 
 #affichons les résultats:
 print("Paramètres initiaux : ", initial_params)
@@ -194,5 +160,9 @@ parameters_list = [
     *["beta_d" + str(i) for i in range(6)],
     *["beta_s" + str(i) for i in range(6)]
     ]
+
 for i, param in enumerate(estimated_params):
-    print(parameters_list[i], " : ", param, "  std :", parameter_std_devs[i])
+    print(parameters_list[i], " : ", param)
+
+print("Liste des paramètres estimés :")
+print(estimated_params)
