@@ -140,12 +140,12 @@ seller['Ts_clone'] = seller['Ts_clone'] * facteur_de_normalisation
 
 #minimisation de l'opposé de la log-vraisemblance
 #paramètres optimaux dans le modèle simple
-initial_params = [-0.34424888965009215, -0.49280408089505745, 0.002994874532042946, 1.982782380814998, 0.3690313874659533, 
-                  -0.26802444043059415, 0.05848169036795936, 0.05372096134726763, 0.6703999999411836, 0.1448369355891595, 0.08531945569799503, 
-                  -0.4298036382553527, 0.04911358820730393, 0.022361765725589313, 1.065760759400694,  0.4874424897141275, 0.19645908908126325]
+initial_params = [-0.16918637, -0.80411716,  0.0025122, 2.0373632, 1.06010146,
+                -0.25212614, 0.0574581, 0.01630263, -0.17397332, 0.23416192,  0.09855507,
+                -0.53473934, 0.05637413, 0.02611917, 0.49317322, 0.32740669,  0.14239238]
 
 result = minimize(likelihood, initial_params, method='Nelder-Mead', options={
-        'disp': True, 'tol': 1e-2, 'maxiter': 300})
+        'disp': True, 'maxiter': 10})  #'tol': 1e-1,
 estimated_params = result.x
 success = result.success
 message = result.message
