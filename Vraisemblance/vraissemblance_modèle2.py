@@ -140,7 +140,7 @@ seller['Ts_clone'] = seller['Ts_clone'] * facteur_de_normalisation
 
 #minimisation de l'opposé de la log-vraisemblance
 #paramètres optimaux dans le modèle simple
-initial_params = [-0.16918637, -0.80411716,  0.0025122, 2.0373632, 1.06010146,
+initial_params = [-0.16918637, -0.80411716, 0.0025122, 2.0373632, 1.06010146,
                 -0.25212614, 0.0574581, 0.01630263, -0.17397332, 0.23416192,  0.09855507,
                 -0.53473934, 0.05637413, 0.02611917, 0.49317322, 0.32740669,  0.14239238]
 
