@@ -13,10 +13,11 @@ from tqdm import tqdm
 
 #Charger les données
 seller = pd.read_csv('Data/dataset_vraissemblance.csv')
+seller = seller[seller['sexe_femme']==1].reset_index()
 facteur_de_normalisation = 10 ** (-5)
 #Colonnes que l'on utilise
-X = ['sexe_femme','idf','etranger','dec1','dec2','dec3']
-columns = ['sexe_femme','idf','etranger','dec1','dec2','dec3','tau_birth','tau_contract',
+X = ['idf','etranger','dec1','dec2','dec3']
+columns = ['idf','etranger','dec1','dec2','dec3','tau_birth','tau_contract',
            'Td','Ts','Td_clone','Ts_clone','tau_begin','tau_end']
 
 #Fonctions pour la contribution 
@@ -68,7 +69,6 @@ def LSeller_i(lambda_d, lambda_s, phi_d, phi_s,delta, i):
         np.exp(- d * (delta * t_end + (1 - delta) * t_begin) - s * t_begin) - np.exp(-t_end * (d + s))) / deno
     denominateur3 = np.exp(-d * t_begin - s * t_end) - np.exp(- t_end * (d + s))
     denominateur = denominateur1 + denominateur2 + denominateur3
-    #print(numerateur, denominateur, denominateur1, denominateur2, denominateur3)
     return numerateur / denominateur
 
 #contribution des clones 
@@ -97,17 +97,6 @@ def LClone_i(lambda_d, lambda_s, phi_d, phi_s,delta, i):
     denominateur3 = np.exp(-d * t_begin - s * t_end) - np.exp(- t_end * (d + s))
     denominateur = denominateur1 + denominateur2 + denominateur3
     return numerateur / denominateur
-    """
-    #calcul numérique 
-    def integ(t):
-        integrande = (np.exp(- phi_d[i] * IDD(initial_params[2], initial_params[0], t_begin, t)) - np.exp(
-            - phi_d[i] * IDD(initial_params[2], initial_params[0], t_end, t))) * s * np.exp(
-                - phi_s[i] * IS(initial_params[1], t))
-        return integrande
-    denominateur2 = quad(integ, 0, 10000)[0]
-    
-    """
-    return numerateur / denominateur
 
 #fonction de vraissemblance
 def likelihood(parameters):
@@ -117,8 +106,8 @@ def likelihood(parameters):
     lambda_d = parameters[0]
     lambda_s = parameters[1]
     delta = parameters[2]
-    beta_d = list(parameters[3:9])
-    beta_s = list(parameters[9:15])
+    beta_d = list(parameters[3:8])
+    beta_s = list(parameters[8:14])
     phi_d = phiD(beta_d) 
     phi_s = phiS(beta_s) 
     L_seller_sum = 0
@@ -131,7 +120,6 @@ def likelihood(parameters):
     Likelihood = L_seller_sum + L_clone_sum 
     print(- Likelihood)
     return - Likelihood
-"""
 
 # Réduire l'ordre de grandeur des variables
 td_mean = (seller['Td'].mean() + seller['Td_clone'].mean()) / 2
@@ -142,11 +130,11 @@ seller['Td_clone'] = seller['Td_clone'] * facteur_de_normalisation
 seller['Ts_clone'] = seller['Ts_clone'] * facteur_de_normalisation
 
 #minimisation de l'opposé de la log-vraisemblance
-initial_params = [8.84172963e+00, 1.23516850e+00, 7.17338893e-01,
-                -1.83292187e-01, -4.64990779e-03, -7.75338530e-02, 3.41439558e-01, 1.74069565e-01, 2.85908646e-02,
-                2.97050800e-02, -9.56602490e-02, -3.41291509e-02, 9.31972376e-02, 6.91866371e-02, 9.63147673e-02]
+initial_params = [1.92650818e-02, 9.94410416e-03, 0.5, #e+01
+                3.46539915e-02, -2.77814442e-02, 5.03694318e-01, 1.48592574e-01, 1.61727855e-02,
+                3.97922026e-02, -5.15284576e-02, 9.46470392e-01, 3.62528242e-01, 7.73050325e-02]
 
-result = minimize(likelihood, initial_params, method='L-BFGS-B', options={'disp': True, 'tol': 1e-2, 'maxiter': 5000})
+result = minimize(likelihood, initial_params, method='L-BFGS-B', options={'disp': True, 'tol': 1e-2, 'maxiter': 10000})
 estimated_params = result.x
 success = result.success
 message = result.message
@@ -158,21 +146,13 @@ print(success)
 print(message)
 parameters_list = [
     "lambda_d", "lambda_s", "delta",
-    *["beta_d" + str(i) for i in range(6)],
-    *["beta_s" + str(i) for i in range(6)]
+    *["beta_d" + str(i) for i in range(5)],
+    *["beta_s" + str(i) for i in range(5)]
     ]
 for i, param in enumerate(estimated_params):
     print(parameters_list[i], " : ", param, "  std :" , std_devs[i])
 
 print(estimated_params)
-"""
 
-print("Moyenne Td chez les vendeur : ", seller['Td'].mean())
-print("Moyenne Td chez les clones : ", seller['Td_clone'].mean())
-print("Moyenne Ts chez les vendeur : ", seller['Ts'].mean())
-print("Nombre d'étrangers : ", seller[seller['etranger']==1].shape[0])
-print("Nombre d'IDF : ", seller[seller['idf']==1].shape[0])
-print("Nombre de femmes : ", seller[seller['sexe_femme']==1].shape[0])
-print("Nombre de dec1 : ", seller[seller['dec1']==1].shape[0])
-print("Nombre de dec2 : ", seller[seller['dec2']==1].shape[0])
-print("Nombre de dec3 : ", seller[seller['dec3']==1].shape[0])
+
+#[ 1.71924228  0.47926533  0.66591163  0.16575556  0.34920412  1.60791143 1.33880041 -1.34693875  0.38316075  0.95958582  0.56691814  0.51742479 -4.05744687]

@@ -145,7 +145,7 @@ initial_params = [-0.16918637, -0.80411716, 0.0025122, 2.0373632, 1.06010146,
                 -0.53473934, 0.05637413, 0.02611917, 0.49317322, 0.32740669,  0.14239238]
 
 result = minimize(likelihood, initial_params, method='Nelder-Mead', options={
-        'disp': True, 'tol': 1e-2, 'maxiter': 10})  #,
+        'disp': True, 'tol': 1e-2, 'maxiter': 10})  
 estimated_params = result.x
 success = result.success
 message = result.message
