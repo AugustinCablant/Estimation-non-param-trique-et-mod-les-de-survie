@@ -168,7 +168,7 @@ initial_params = [6.04346613e-03, 6.31093146e-03, 10.79241345, 9.45523846e-01,-5
                   7.99081591e-01, 3.06774052e-02]
 
 
-"""
+
 result = minimize(likelihood, initial_params, method='Nelder-Mead', options={'disp': True, 'tol': 1e-6, 'maxiter': 50000})
 estimated_params = result.x
 success = result.success
@@ -211,6 +211,3 @@ parameters_list = [
     ]
 for i, param in enumerate(estimated_params):
     print(parameters_list[i], " : ", param, "  std :", parameter_std_devs[i])
-"""
-
-print(likelihood(initial_params))
