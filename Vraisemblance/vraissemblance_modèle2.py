@@ -140,15 +140,17 @@ seller['Ts_clone'] = seller['Ts_clone'] * facteur_de_normalisation
 
 #minimisation de l'opposé de la log-vraisemblance
 #paramètres optimaux dans le modèle simple
-initial_params = [-0.16918637, -0.80411716, 0.0025122, 2.0373632, 1.06010146,
+initial_params = [-0.16918637, -0.80411716, 0.0025122, 2.0373632, 7.17338893e-01,
                 -0.25212614, 0.0574581, 0.01630263, -0.17397332, 0.23416192,  0.09855507,
                 -0.53473934, 0.05637413, 0.02611917, 0.49317322, 0.32740669,  0.14239238]
 
-result = minimize(likelihood, initial_params, method='Nelder-Mead', options={
-        'disp': True, 'tol': 1e-2, 'maxiter': 10})  
+result = minimize(likelihood, initial_params, method='L-BFGS-B', options={
+        'disp': True, 'tol': 1e-1, 'maxiter': 1000})  
 estimated_params = result.x
 success = result.success
 message = result.message
+hessian_inv = result.hess_inv.todense()
+std_devs = np.sqrt(np.diag(hessian_inv))
 
 #affichons les résultats:
 print("Paramètres initiaux : ", initial_params)
@@ -162,7 +164,7 @@ parameters_list = [
     ]
 
 for i, param in enumerate(estimated_params):
-    print(parameters_list[i], " : ", param)
+    print(parameters_list[i], " : ", param, "  std :" , std_devs[i])
 
 print("Liste des paramètres estimés :")
 print(estimated_params)
