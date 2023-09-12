@@ -140,17 +140,33 @@ seller['Ts_clone'] = seller['Ts_clone'] * facteur_de_normalisation
 
 #minimisation de l'opposé de la log-vraisemblance
 #paramètres optimaux dans le modèle simple
+"""
 initial_params = [-0.16918637, -0.80411716, 0.0025122, 2.0373632, 7.17338893e-01,
                 -0.25212614, 0.0574581, 0.01630263, -0.17397332, 0.23416192,  0.09855507,
                 -0.53473934, 0.05637413, 0.02611917, 0.49317322, 0.32740669,  0.14239238]
 
-result = minimize(likelihood, initial_params, method='L-BFGS-B', options={
-        'disp': True, 'tol': 1e-1, 'maxiter': 1000})  
+initial_params = [-1.59337252e-01, -8.31844675e-01, 1.37925407e-03, 1.77170059e+00, 1.07245877e+00,
+                -2.23469420e-01, 7.49114657e-02, 1.66237376e-02, -1.59958062e-01, 2.33702806e-01 , 9.40838080e-02,
+                -5.00065795e-01, 6.12129269e-02, 3.28788669e-02, 4.66556459e-01, 2.69792507e-01, 1.45910530e-01]
+
+initial_params =   [-1.59337174e-01, -8.31864357e-01, 1.37925367e-03, 1.77183108e+00, 1.07246029e+00,
+                -2.23469366e-01, 7.50065520e-02, 1.66237345e-02, -1.60184395e-01, 2.33702754e-01, 9.40838523e-02,
+                -5.00065722e-01, 6.12130795e-02, 3.28788687e-02, 4.89838795e-01, 3.11520181e-01, 1.45910532e-01]
+"""
+
+
+
+initial_params = [-1.59337174e-01, -8.31864357e-01, 1.37925367e-03, 1.77183108e+00, 1.07246029e+00,
+                -2.23469366e-01, 7.50358514e-02, 1.66237345e-02, -1.60246967e-01, 2.33702754e-01, 9.40838523e-02, 
+                -5.00065722e-01, 6.12130795e-02, 3.28788687e-02, 4.89838796e-01, 3.26852815e-01, 1.45910532e-01]
+
+result = minimize(likelihood, initial_params, method='Nelder-Mead', options={
+        'disp': True, 'tol': 1e-1, 'maxiter': 100})   # 
 estimated_params = result.x
 success = result.success
 message = result.message
-hessian_inv = result.hess_inv.todense()
-std_devs = np.sqrt(np.diag(hessian_inv))
+#hessian_inv = result.hess_inv.todense()
+#std_devs = np.sqrt(np.diag(hessian_inv))
 
 #affichons les résultats:
 print("Paramètres initiaux : ", initial_params)
@@ -164,7 +180,7 @@ parameters_list = [
     ]
 
 for i, param in enumerate(estimated_params):
-    print(parameters_list[i], " : ", param, "  std :" , std_devs[i])
+    print(parameters_list[i], " : ", param)  #, "  std :" , std_devs[i])
 
 print("Liste des paramètres estimés :")
 print(estimated_params)
