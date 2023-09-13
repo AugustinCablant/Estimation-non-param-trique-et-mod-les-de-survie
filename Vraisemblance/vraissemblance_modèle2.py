@@ -161,13 +161,13 @@ initial_params = [-1.59353616e-01, -8.31864357e-01, 1.37932207e-03, 1.77183110e+
 -5.00065722e-01, 6.12160451e-02, 3.28788687e-02, 4.89838884e-01, 3.51561113e-01, 1.45910532e-01]
 
 
-result = minimize(likelihood, initial_params, method='L-BFGS-B', options={
-        'disp': True, 'tol': 1e-2, 'maxiter': 200})   # 
+result = minimize(likelihood, initial_params, method='Nelder-Mead', options={
+        'disp': True, 'tol': 1e-3, 'maxiter': 200})   # 
 estimated_params = result.x
 success = result.success
 message = result.message
-hessian_inv = result.hess_inv.todense()
-std_devs = np.sqrt(np.diag(hessian_inv))
+#hessian_inv = result.hess_inv.todense()
+#std_devs = np.sqrt(np.diag(hessian_inv))
 
 #affichons les résultats:
 print("Paramètres initiaux : ", initial_params)
@@ -181,7 +181,7 @@ parameters_list = [
     ]
 
 for i, param in enumerate(estimated_params):
-    print(parameters_list[i], " : ", param, "  std :" , std_devs[i])
+    print(parameters_list[i], " : ", param)  #, "  std :" , std_devs[i])
 
 print("Liste des paramètres estimés :")
 print(estimated_params)
