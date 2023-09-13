@@ -131,7 +131,7 @@ def likelihood(parameters):
     Likelihood = L_seller_sum + L_clone_sum 
     print(- Likelihood)
     return - Likelihood
-"""
+
 
 # Réduire l'ordre de grandeur des variables
 td_mean = (seller['Td'].mean() + seller['Td_clone'].mean()) / 2
@@ -176,3 +176,5 @@ print("Nombre de femmes : ", seller[seller['sexe_femme']==1].shape[0])
 print("Nombre de dec1 : ", seller[seller['dec1']==1].shape[0])
 print("Nombre de dec2 : ", seller[seller['dec2']==1].shape[0])
 print("Nombre de dec3 : ", seller[seller['dec3']==1].shape[0])
+
+"""

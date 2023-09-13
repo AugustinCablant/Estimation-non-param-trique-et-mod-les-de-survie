@@ -16,7 +16,7 @@ import random
 
 #Charger les données
 seller = pd.read_csv('Data/dataset_vraissemblance.csv')
-facteur_de_normalisation = 10 ** (-3)
+facteur_de_normalisation = 10 ** (-4)
 #Colonnes que l'on utilise
 X = ['sexe_femme','idf','etranger','dec1','dec2','dec3']
 columns = ['sexe_femme','idf','etranger','dec1','dec2','dec3','tau_birth','tau_contract',
