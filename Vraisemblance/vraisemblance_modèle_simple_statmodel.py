@@ -112,7 +112,7 @@ def LClone_i(lambda_d, lambda_s, phi_d, phi_s,delta, i):
     return numerateur / denominateur
 
 
-class MyLikelihoodModel(sm.base.Model):
+class MyLikelihoodModel(sm.OLS):
     def __init__(self, endog, exog):
         super(MyLikelihoodModel, self).__init__(endog, exog)
 
@@ -153,27 +153,14 @@ initial_params = [8.84172963e+00, 1.23516850e+00, 7.17338893e-01,
                 -1.83292187e-01, -4.64990779e-03, -7.75338530e-02, 3.41439558e-01, 1.74069565e-01, 2.85908646e-02,
                 2.97050800e-02, -9.56602490e-02, -3.41291509e-02, 9.31972376e-02, 6.91866371e-02, 9.63147673e-02]
 
-endog, exog = 
+endog, exog = seller['Ts'],  seller[X]
 
 model = MyLikelihoodModel(endog, exog)
 
 # Estimez les paramètres
-results = model.fit(start_params=initial_params, method='newton')
+results = model.fit(method='pinv', start_params=initial_params)
 parametres = results.params
 standard_error = results.bse
 p_values = results.pvalues
 interval = results.aic
-print('Parameters: ', results)
-print('Standard errors: ', standard_error)
-print('P-values: ', p_values)
-print('AIC: ', interval)
-#affichons les résultats:
-
-parameters_list = [
-    "lambda_d", "lambda_s", "delta",
-    *["beta_d" + str(i) for i in range(6)],
-    *["beta_s" + str(i) for i in range(6)]
-    ]
-for i, param in enumerate(estimated_params):
-    print(parameters_list[i], " : ", param, "  std :" , std_devs[i])
-
+print(results.summary())
