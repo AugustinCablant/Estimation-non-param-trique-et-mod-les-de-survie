@@ -161,13 +161,14 @@ initial_params = [-1.59353616e-01, -8.31864357e-01, 1.37932207e-03, 1.77183110e+
 -5.00065722e-01, 6.12160451e-02, 3.28788687e-02, 4.89838884e-01, 3.51561113e-01, 1.45910532e-01]
 
 
-result = minimize(log_likelihood, initial_params, method='BFGS', options={
-        'disp': True, 'tol': 1e-1, 'maxiter': 100})   # 
+result = minimize(log_likelihood, initial_params, method='L-BFGS-B', options={
+        'disp': True, 'tol': 1e-2, 'maxiter': 100})   # 
 estimated_params = result.x
 success = result.success
 message = result.message
-hessian_inv = result.hess_inv  #.todense()
-std_devs = np.sqrt(np.diag(hessian_inv))
+cov_matrix = result.hess_inv.todense()
+std_devs = np.sqrt(np.diagonal(cov_matrix))
+z_score = 1.96  #intervalle de confiance à 0.95%
 
 #affichons les résultats:
 print("Paramètres initiaux : ", initial_params)
@@ -181,7 +182,5 @@ parameters_list = [
     ]
 
 for i, param in enumerate(estimated_params):
-    print(parameters_list[i], " : ", param, "  std :" , std_devs[i])
-
-print("Liste des paramètres estimés :")
-print(estimated_params)
+    print(parameters_list[i], " :--- ", param, "---  std :" , std_devs[i], "--- IC :", (
+        estimated_params[i] - z_score * std_devs[i], estimated_params[i] + z_score * std_devs[i]))
