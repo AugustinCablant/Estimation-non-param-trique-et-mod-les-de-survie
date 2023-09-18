@@ -110,7 +110,7 @@ def LClone_i(lambda_d, lambda_s, phi_d, phi_s,delta, i):
     return numerateur / denominateur
 
 #fonction de vraissemblance
-def likelihood(parameters):
+def log_likelihood(parameters):
     # Paramètres à trouver
     # lambda_d, lambda_s et delta des réels 
     # beta_d et beta_s des vecteurs de taille 6
@@ -129,8 +129,8 @@ def likelihood(parameters):
         L_seller_sum = L_seller_sum + Log_seller_i
         L_clone_sum = L_clone_sum + Log_clone_i
     Likelihood = L_seller_sum + L_clone_sum 
-    print(- Likelihood)
-    return - Likelihood
+    print(- Likelihood / seller.shape[0])
+    return - Likelihood / seller.shape[0]
 
 
 # Réduire l'ordre de grandeur des variables
@@ -146,12 +146,13 @@ initial_params = [8.84172963e+00, 1.23516850e+00, 7.17338893e-01,
                 -1.83292187e-01, -4.64990779e-03, -7.75338530e-02, 3.41439558e-01, 1.74069565e-01, 2.85908646e-02,
                 2.97050800e-02, -9.56602490e-02, -3.41291509e-02, 9.31972376e-02, 6.91866371e-02, 9.63147673e-02]
 
-result = minimize(likelihood, initial_params, method='L-BFGS-B', options={'disp': True, 'tol': 1e-2, 'maxiter': 5000})
+result = minimize(log_likelihood, initial_params, method='L-BFGS-B', options={'disp': True, 'tol': 1e-2, 'maxiter': 5000})
 estimated_params = result.x
 success = result.success
 message = result.message
-hessian_inv = result.hess_inv.todense()
-std_devs = np.sqrt(np.diag(hessian_inv))
+cov_matrix = result.hess_inv.todense()
+std_devs = np.sqrt(np.diagonal(cov_matrix))
+z_score = 1.96  #intervalle de confiance à 0.95%
 
 #affichons les résultats:
 print(success)
@@ -162,19 +163,5 @@ parameters_list = [
     *["beta_s" + str(i) for i in range(6)]
     ]
 for i, param in enumerate(estimated_params):
-    print(parameters_list[i], " : ", param, "  std :" , std_devs[i])
-
-print(estimated_params)
-"""
-
-print("Moyenne Td chez les vendeur : ", seller['Td'].mean())
-print("Moyenne Td chez les clones : ", seller['Td_clone'].mean())
-print("Moyenne Ts chez les vendeur : ", seller['Ts'].mean())
-print("Nombre d'étrangers : ", seller[seller['etranger']==1].shape[0])
-print("Nombre d'IDF : ", seller[seller['idf']==1].shape[0])
-print("Nombre de femmes : ", seller[seller['sexe_femme']==1].shape[0])
-print("Nombre de dec1 : ", seller[seller['dec1']==1].shape[0])
-print("Nombre de dec2 : ", seller[seller['dec2']==1].shape[0])
-print("Nombre de dec3 : ", seller[seller['dec3']==1].shape[0])
-
-"""
+    print(parameters_list[i], " :--- ", param, "---  std :" , std_devs[i], "--- IC :", (
+        estimated_params[i] - z_score * std_devs[i], estimated_params[i] + z_score * std_devs[i]))

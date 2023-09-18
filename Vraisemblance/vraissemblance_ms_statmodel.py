@@ -112,32 +112,30 @@ def LClone_i(lambda_d, lambda_s, phi_d, phi_s,delta, i):
     return numerateur / denominateur
 
 
-class MyLikelihoodModel(sm.OLS):
-    def __init__(self, endog, exog):
-        super(MyLikelihoodModel, self).__init__(endog, exog)
 
-    #fonction de vraissemblance
-    def likelihood(self, parameters):
-        # Paramètres à trouver
-        # lambda_d, lambda_s et delta des réels 
-        # beta_d et beta_s des vecteurs de taille 6
-        lambda_d = parameters[0]
-        lambda_s = parameters[1]
-        delta = parameters[2]
-        beta_d = list(parameters[3:9])
-        beta_s = list(parameters[9:15])
-        phi_d = phiD(beta_d) 
-        phi_s = phiS(beta_s) 
-        L_seller_sum = 0
-        L_clone_sum = 0
-        for i in tqdm(seller.index.to_list()): 
-            Log_seller_i = np.log(LSeller_i(lambda_d, lambda_s, phi_d, phi_s, delta, i))
-            Log_clone_i = np.log(LClone_i(lambda_d, lambda_s, phi_d, phi_s, delta, i))
-            L_seller_sum = L_seller_sum + Log_seller_i
-            L_clone_sum = L_clone_sum + Log_clone_i
-        Likelihood = L_seller_sum + L_clone_sum 
-        print(- Likelihood)
-        return - Likelihood
+
+#fonction de vraissemblance
+def likelihood(parameters, seller):
+    # Paramètres à trouver
+    # lambda_d, lambda_s et delta des réels 
+    # beta_d et beta_s des vecteurs de taille 6
+    lambda_d = parameters[0]
+    lambda_s = parameters[1]
+    delta = parameters[2]
+    beta_d = list(parameters[3:9])
+    beta_s = list(parameters[9:15])
+    phi_d = phiD(beta_d) 
+    phi_s = phiS(beta_s) 
+    L_seller_sum = 0
+    L_clone_sum = 0
+    for i in tqdm(seller.index.to_list()): 
+        Log_seller_i = np.log(LSeller_i(lambda_d, lambda_s, phi_d, phi_s, delta, i))
+        Log_clone_i = np.log(LClone_i(lambda_d, lambda_s, phi_d, phi_s, delta, i))
+        L_seller_sum = L_seller_sum + Log_seller_i
+        L_clone_sum = L_clone_sum + Log_clone_i
+    Likelihood = L_seller_sum + L_clone_sum 
+    print(- Likelihood)
+    return - Likelihood
 
 
 # Réduire l'ordre de grandeur des variables
@@ -153,12 +151,11 @@ initial_params = [8.84172963e+00, 1.23516850e+00, 7.17338893e-01,
                 -1.83292187e-01, -4.64990779e-03, -7.75338530e-02, 3.41439558e-01, 1.74069565e-01, 2.85908646e-02,
                 2.97050800e-02, -9.56602490e-02, -3.41291509e-02, 9.31972376e-02, 6.91866371e-02, 9.63147673e-02]
 
-endog, exog = seller['Td'],  seller[X]
-
-model = MyLikelihoodModel(endog, exog)
+data = seller[X]
+model = sm.MNLogit(seller, initial_params)
 
 # Estimez les paramètres
-results = model.fit(method='pinv', start_params=initial_params)
+results = model.fit(method='newton')  
 parametres = results.params
 standard_error = results.bse
 p_values = results.pvalues

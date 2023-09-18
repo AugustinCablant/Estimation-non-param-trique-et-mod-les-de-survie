@@ -106,7 +106,7 @@ def LClone_i(alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s,delta, i):
     return numerateur / denominateur
 
 #fonction de vraissemblance
-def likelihood(parameters):
+def log_likelihood(parameters):
     # Paramètres à trouver
     # lambda_d, lambda_s et delta des réels 
     # beta_d et beta_s des vecteurs de taille 6
@@ -127,8 +127,8 @@ def likelihood(parameters):
         L_seller_sum = L_seller_sum + Log_seller_i
         L_clone_sum = L_clone_sum + Log_clone_i
     Likelihood = L_seller_sum + L_clone_sum 
-    print(- Likelihood)
-    return - Likelihood
+    print(- Likelihood / seller.shape[0])
+    return - Likelihood / seller.shape[0]
 
 # Réduire l'ordre de grandeur des variables
 td_mean = (seller['Td'].mean() + seller['Td_clone'].mean()) / 2
@@ -161,7 +161,7 @@ initial_params = [-1.59353616e-01, -8.31864357e-01, 1.37932207e-03, 1.77183110e+
 -5.00065722e-01, 6.12160451e-02, 3.28788687e-02, 4.89838884e-01, 3.51561113e-01, 1.45910532e-01]
 
 
-result = minimize(likelihood, initial_params, method='BFGS', options={
+result = minimize(log_likelihood, initial_params, method='BFGS', options={
         'disp': True, 'tol': 1e-1, 'maxiter': 100})   # 
 estimated_params = result.x
 success = result.success
