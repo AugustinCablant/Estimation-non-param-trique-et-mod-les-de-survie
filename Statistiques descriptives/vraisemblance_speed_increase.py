@@ -17,6 +17,8 @@ import random
 
 #Charger les données
 seller = pd.read_csv('Data/dataset_vraissemblance.csv')
+seller['Lseller'] = 0
+seller['Lclone'] = 0
 facteur_de_normalisation = 10 ** (-4)
 #Colonnes que l'on utilise
 X = ['sexe_femme','idf','etranger','dec1','dec2','dec3']
@@ -61,7 +63,7 @@ def get_denominateur(alpha_d, alpha_s, sigma_d2,  sigma_s2, phi_d, phi_s, delta,
     return intervalle1 + intervalle2
 
 #Contribution du vendeur 
-def LSeller_i(alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s,delta, i):
+def seller_fct(row, alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s,delta):
     """
     alpha_d / alpha_s / sigma_d2/ sigma_s2/ delta des scalaires 
     phi_d / phi_s des vecteurs
@@ -70,8 +72,9 @@ def LSeller_i(alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s,delta, i):
     cette fonction retourne la contribution du ième vendeur à la fonction de vraisemblance  
     """
     #quelques variables pour faciliter la lecture
-    Td = seller['Td'][i]
-    Ts = seller['Ts'][i]
+    i = row.name
+    Td = row['Td']
+    Ts = row['Ts']
     t_end = (seller['tau_end'][i] - seller['tau_birth'][i]) * facteur_de_normalisation
     #numerateur
     numerateur1 = (1 + sigma_d2 * phi_d[i] * IDD(alpha_d, alpha_s, delta, Td, Ts)) ** (- sigma_d2 - 1)
@@ -83,8 +86,9 @@ def LSeller_i(alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s,delta, i):
     #resultat
     return numerateur / denominateur
 
+
 #contribution des clones 
-def LClone_i(alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s,delta, i):
+def clone_fct(row, alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s,delta):
     """
     alpha_d / alpha_s / sigma_d2/ sigma_s2/ delta des scalaires  
     phi_d / phi_s des vecteurs
@@ -93,6 +97,7 @@ def LClone_i(alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s,delta, i):
     cette fonction retourne la contribution du ième clone à la fonction de vraisemblance  
     """
     #quelques variables pour faciliter la lecture
+    i = row.name
     Td_seller = seller['Td'][i]
     Td_clone = seller['Td_clone'][i]
     Ts = seller['Ts'][i]
@@ -107,7 +112,7 @@ def LClone_i(alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s,delta, i):
     return numerateur / denominateur
 
 #fonction de vraissemblance
-def log_likelihood(parameters):
+def likelihood(parameters):
     # Paramètres à trouver
     # lambda_d, lambda_s et delta des réels 
     # beta_d et beta_s des vecteurs de taille 6
@@ -120,16 +125,11 @@ def log_likelihood(parameters):
     beta_s = list(parameters[11:17])
     phi_d = phiD(beta_d) 
     phi_s = phiS(beta_s) 
-    L_seller_sum = 0
-    L_clone_sum = 0
-    for i in tqdm(seller.index.to_list()): 
-        Log_seller_i = np.log(LSeller_i(alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s,delta, i))
-        Log_clone_i = np.log(LClone_i(alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s,delta, i))
-        L_seller_sum = L_seller_sum + Log_seller_i
-        L_clone_sum = L_clone_sum + Log_clone_i
-    Likelihood = (L_seller_sum + L_clone_sum) / seller.shape[0]
-    log_likelihood_values.append(-Likelihood)
-    print(-Likelihood)
+    seller['Lseller'] = seller.apply(seller_fct, axis=1, args=(alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s, delta))
+    seller['Lclone'] = seller.apply(clone_fct, axis=1, args=(alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s, delta))
+    Likelihood = np.prod(seller['Lseller']) * np.prod(seller['Lclone'])
+    likelihood_values.append(Likelihood)
+    print(Likelihood)
     return - Likelihood 
 
 # Réduire l'ordre de grandeur des variables
@@ -142,18 +142,18 @@ seller['Ts_clone'] = seller['Ts_clone'] * facteur_de_normalisation
 
 #minimisation de l'opposé de la log-vraisemblance
 #paramètres optimaux dans le modèle simple
+initial_params = [-0.16918637, -0.80411716, 0.0025122, 2.0373632, 7.17338893e-01,
+                -0.25212614, 0.0574581, 0.01630263, -0.17397332, 0.23416192,  0.09855507,
+                -0.53473934, 0.05637413, 0.02611917, 0.49317322, 0.32740669,  0.14239238]
 
-initial_params = [-1.59337252e-01, -8.31844675e-01, 1.37925407e-03, 1.77170059e+00, 1.07245877e+00,
-                -2.23469420e-01, 7.49114657e-02, 1.66237376e-02, -1.59958062e-01, 2.33702806e-01 , 9.40838080e-02,
-                -5.00065795e-01, 6.12129269e-02, 3.28788669e-02, 4.66556459e-01, 2.69792507e-01, 1.45910530e-01]
 
-log_likelihood_values = []
-result = minimize(log_likelihood, initial_params, method='Nelder-Mead', options={
-        'disp': True, 'tol': 1e-1, 'maxiter': 10000})   
+likelihood_values = []
+result = minimize(likelihood, initial_params, method='Nelder-Mead', options={
+        'disp': True, 'tol': 1e-2, 'maxiter': 1000})   
 estimated_params = result.x
 success = result.success
 message = result.message
-#cov_matrix = result.hess_inv.todense()  #si L-BFGS-B
+#cov_matrix = result.hess_inv  #todense() si L-BFGS-B
 #std_devs = np.sqrt(np.diagonal(cov_matrix))
 #z_score = 1.96  #intervalle de confiance à 0.95%
 
@@ -169,11 +169,12 @@ parameters_list = [
     ]
 
 for i, param in enumerate(estimated_params):
-    print(parameters_list[i], " :--- ", param)  #, "---  std :" , std_devs[i], "--- IC :", estimated_params[i] - z_score * std_devs[i], estimated_params[i] + z_score * std_devs[i])
+    print(parameters_list[i], " :--- ", param)  #, "---  std :" , std_devs[i], "--- IC :", (
+        #estimated_params[i] - z_score * std_devs[i], estimated_params[i] + z_score * std_devs[i]))
     
 plt.figure(figsize = (10,8))
-plt.plot(list(range(len(log_likelihood_values))), log_likelihood_values)
-plt.title("log-likelihood en fonction des itérations")
+plt.plot(list(range(len(likelihood_values))), likelihood_values)
+plt.title("likelihood en fonction des itérations")
 plt.xlabel("Iterations")
-plt.ylabel("log-likelihood")
+plt.ylabel("likelihood")
 plt.show()
