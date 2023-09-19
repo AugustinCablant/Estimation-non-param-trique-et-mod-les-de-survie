@@ -12,6 +12,7 @@ import pandas as pd
 from scipy.optimize import minimize
 from scipy.integrate import quad
 from tqdm import tqdm
+import matplotlib.pyplot as plt
 import random
 
 #Charger les données
@@ -126,10 +127,9 @@ def log_likelihood(parameters):
         Log_clone_i = np.log(LClone_i(alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s,delta, i))
         L_seller_sum = L_seller_sum + Log_seller_i
         L_clone_sum = L_clone_sum + Log_clone_i
-    Likelihood = L_seller_sum + L_clone_sum 
-    print(- Likelihood / seller.shape[0])
-    return - Likelihood / seller.shape[0]
-
+    Likelihood = (L_seller_sum + L_clone_sum) / seller.shape[0]
+    log_likelihood_values.append(-Likelihood)
+    return - Likelihood 
 # Réduire l'ordre de grandeur des variables
 td_mean = (seller['Td'].mean() + seller['Td_clone'].mean()) / 2
 ts_mean = seller['Ts'].mean()
@@ -160,8 +160,8 @@ initial_params = [-1.59353616e-01, -8.31864357e-01, 1.37932207e-03, 1.77183110e+
  -2.23469366e-01, 7.69417913e-02, 1.66237345e-02, -1.60253813e-01, 2.33702754e-01, 9.40838523e-02,
 -5.00065722e-01, 6.12160451e-02, 3.28788687e-02, 4.89838884e-01, 3.51561113e-01, 1.45910532e-01]
 
-
-result = minimize(log_likelihood, initial_params, method='L-BFGS-B', options={
+log_likelihood_values = []
+result = minimize(log_likelihood, initial_params, method='BFGS', options={
         'disp': True, 'tol': 1e-2, 'maxiter': 100})   # 
 estimated_params = result.x
 success = result.success
@@ -184,3 +184,10 @@ parameters_list = [
 for i, param in enumerate(estimated_params):
     print(parameters_list[i], " :--- ", param, "---  std :" , std_devs[i], "--- IC :", (
         estimated_params[i] - z_score * std_devs[i], estimated_params[i] + z_score * std_devs[i]))
+    
+plt.figure(figsize = (10,8))
+plt.plot(list(range(len(log_likelihood_values))), log_likelihood_values)
+plt.title("log-likelihood en fonction des itérations")
+plt.xlabel("Iterations")
+plt.ylabel("log-likelihood")
+plt.show()
