@@ -149,7 +149,7 @@ initial_params = [-1.59337252e-01, -8.31844675e-01, 1.37925407e-03, 1.77170059e+
 
 log_likelihood_values = []
 result = minimize(log_likelihood, initial_params, method='Nelder-Mead', options={
-        'disp': True, 'tol': 1e-1, 'maxiter': 500})   
+        'disp': True, 'tol': 1e-1, 'maxiter': 2000})   
 estimated_params = result.x
 success = result.success
 message = result.message
