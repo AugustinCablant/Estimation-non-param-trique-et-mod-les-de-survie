@@ -2,7 +2,6 @@
 library(readr)
 library(stats)
 library(Matrix)
-library(numDeriv)
 library(bbmle)
 library(pracma)
 
@@ -66,10 +65,9 @@ IS <- function(lambda_s, t) {
 # Définir la fonction get_denominateur
 get_denominateur <- function(alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s, delta, t_end, i) {
   integrande_denominateur <- function(t) {
-    gauche <- 1 - (1 + sigma_d2 * phi_d[i,] * IDD(alpha_d, alpha_s, delta, t_end, t)) ^ (-sigma_d2 - 1)
-    droite <- phi_s[i,] * lambda_s(alpha_s, t) * (1 + (1 + sigma_s2 * phi_s[i,] * IS(alpha_s, t)) ^ (-sigma_s2 - 1))
-    return(gauche * droite)
-  }
+    gauche <- 1 - (1 + sigma_d2 * phi_d[i,] * IDD(alpha_d, alpha_s, delta, t_end, t))^{-round(sigma_d2, digits = 0) - 1}
+    droite <- phi_s[i,] * lambda_s(alpha_s, t) * (1 + (1 + sigma_s2 * phi_s[i,] * IS(alpha_s, t))^{-round(sigma_s2, digits=0) - 1})
+    return (gauche * droite) }
   intervalle1 <- quadgk(integrande_denominateur, 0, t_end)$value
   intervalle2 <- quadgk(integrande_denominateur, t_end, Inf)$value
   print(intervalle1)
@@ -83,14 +81,14 @@ LSeller_i <- function(alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s, delta,
   Ts <- seller$Ts[i]
   t_end <- (seller$tau_end[i] - seller$tau_birth[i]) * facteur_de_normalisation
   # Numérateur
-  numerateur1 <- (1 + sigma_d2 * phi_d[i] * IDD(alpha_d, alpha_s, delta, Td, Ts)) ^ (-sigma_d2 - 1)
+  numerateur1 <- (1 + sigma_d2 * phi_d[i] * IDD(alpha_d, alpha_s, delta, Td, Ts))^{-round(sigma_d2, digits = 0) - 1}
   numerateur2 <- delta * phi_d[i,] * phi_s[i,] * lambda_s(alpha_s, Ts) * lambda_d(alpha_d, Td) *
-    (1 + sigma_s2 * phi_s[i,] * IS(alpha_s, Ts)^{(-sigma_s2 - 1)})
+    (1 + sigma_s2 * phi_s[i,] * IS(alpha_s, Ts)^{(-round(sigma_s2, digits = 0) - 1)})
   numerateur <- numerateur1 * numerateur2
-  #le problème réside dans les exposants
   
   # Dénominateur
   denominateur <- get_denominateur(alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s, delta, t_end, i)
+  print(denominateur)
   # Résultat
   return(numerateur / denominateur)
 }
@@ -103,8 +101,8 @@ LClone_i <- function(alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s, delta, 
   Ts <- seller$Ts[i]
   t_end <- (seller$tau_end[i] - seller$tau_birth[i]) * facteur_de_normalisation
   # Numérateur
-  numerateur1 <- (1 + sigma_d2 * phi_d[i]) ^ (-sigma_d2 - 1)
-  numerateur2 <- phi_d[i] * lambda_d(alpha_d, Td_seller) * (1 + sigma_s2 * phi_s[i] * IS(alpha_s, Td_clone)) ^ (-sigma_s2 - 1)
+  numerateur1 <- (1 + sigma_d2 * phi_d[i])^{-round(sigma_d2) - 1} 
+  numerateur2 <- phi_d[i] * lambda_d(alpha_d, Td_seller) * (1 + sigma_s2 * phi_s[i] * IS(alpha_s, Td_clone)) ^{-round(sigma_s2) - 1}
   numerateur <- numerateur1 * numerateur2
   
   # Dénominateur
