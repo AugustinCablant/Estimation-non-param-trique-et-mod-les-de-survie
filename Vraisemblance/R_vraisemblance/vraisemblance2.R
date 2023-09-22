@@ -1,6 +1,6 @@
 #install.packages("pracma")
 library(readr)
-library(stats)
+library(stats4)
 library(Matrix)
 library(bbmle)
 library(pracma)
@@ -43,6 +43,16 @@ IDD <- function(alpha_d, alpha_s, delta, t_1, t_2) {
   return(I)
 }
 
+#variante de IDD car je rencontre des problèmes dans le calcul des intégrales
+#ici c'est le cas où t_1 <= t_2 (ça sera notre intégrale avec intervalle 1)
+IDD1 <- function(alpha_d, alpha_s, delta, t_1, t_2) {
+  I <- (exp(alpha_d * t_1) - 1) / alpha_d
+  return(I)}
+
+IDD2 <- function(alpha_d, alpha_s, delta, t_1, t_2) {
+  I <- ((1 - delta) * exp(alpha_d * t_2) + exp(alpha_d * t_1) - 1) / alpha_d
+  return(I)}
+
 # Définir la fonction lambda_d 
 lambda_d <- function(alpha_d, t) {
   return(exp(alpha_d * t))
@@ -62,17 +72,6 @@ IS <- function(lambda_s, t) {
   return(I)
 }
 
-# Définir la fonction get_denominateur
-get_denominateur <- function(alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s, delta, t_end, i) {
-  integrande_denominateur <- function(t) {
-    gauche <- 1 - (1 + sigma_d2 * phi_d[i,] * IDD(alpha_d, alpha_s, delta, t_end, t))^{-round(sigma_d2, digits = 0) - 1}
-    droite <- phi_s[i,] * lambda_s(alpha_s, t) * (1 + (1 + sigma_s2 * phi_s[i,] * IS(alpha_s, t))^{-round(sigma_s2, digits=0) - 1})
-    return (gauche * droite) }
-  intervalle1 <- quadgk(integrande_denominateur, 0, t_end)$value
-  intervalle2 <- quadgk(integrande_denominateur, t_end, Inf)$value
-  print(intervalle1)
-  return(intervalle1 + intervalle2)
-}
 
 # Définir la fonction LSeller_i
 LSeller_i <- function(alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s, delta, i) {
@@ -85,10 +84,19 @@ LSeller_i <- function(alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s, delta,
   numerateur2 <- delta * phi_d[i,] * phi_s[i,] * lambda_s(alpha_s, Ts) * lambda_d(alpha_d, Td) *
     (1 + sigma_s2 * phi_s[i,] * IS(alpha_s, Ts)^{(-round(sigma_s2, digits = 0) - 1)})
   numerateur <- numerateur1 * numerateur2
-  
+
   # Dénominateur
-  denominateur <- get_denominateur(alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s, delta, t_end, i)
-  print(denominateur)
+  integrande_denominateur1 <- function(t) {
+    gauche <- 1 - (1 + sigma_d2 * phi_d[i,] * IDD1(alpha_d, alpha_s, delta, t_end, t))^{-round(sigma_d2, digits = 0) - 1}
+    droite <- phi_s[i,] * lambda_s(alpha_s, t) * (1 + (1 + sigma_s2 * phi_s[i,] * IS(alpha_s, t))^{-round(sigma_s2, digits=0) - 1})
+    return (gauche * droite) }
+  integrande_denominateur2 <- function(t) {
+    gauche <- 1 - (1 + sigma_d2 * phi_d[i,] * IDD2(alpha_d, alpha_s, delta, t_end, t))^{-round(sigma_d2, digits = 0) - 1}
+    droite <- phi_s[i,] * lambda_s(alpha_s, t) * (1 + (1 + sigma_s2 * phi_s[i,] * IS(alpha_s, t))^{-round(sigma_s2, digits=0) - 1})
+    return (gauche * droite) }
+  intervalle1 <- integrate(integrande_denominateur1, lower = 0.001, upper = t_end)$value
+  intervalle2 <- integrate(integrande_denominateur2, lower = t_end, upper = 10)$value
+  denominateur <- intervalle1 + intervalle2
   # Résultat
   return(numerateur / denominateur)
 }
