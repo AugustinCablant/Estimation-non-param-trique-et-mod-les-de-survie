@@ -84,21 +84,8 @@ LSeller_i <- function(alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s, delta,
   numerateur2 <- delta * phi_d[i,] * phi_s[i,] * lambda_s(alpha_s, Ts) * lambda_d(alpha_d, Td) 
   numerateur3 <- (1 + sigma_s2 * phi_s[i,] * IS(alpha_s, Ts))**(-round(sigma_s2, digits = 0) - 1)
   numerateur <- numerateur1 * numerateur2 * numerateur3
-
-  # Dénominateur
-  integrande_denominateur1 <- function(t) {
-    gauche <- 1 - (1 + sigma_d2 * phi_d[i,] * IDD1(alpha_d, alpha_s, delta, t_end, t))**(-round(sigma_d2, digits = 0) - 1)
-    droite <- phi_s[i,] * lambda_s(alpha_s, t) * (1 + (1 + sigma_s2 * phi_s[i,] * IS(alpha_s, t))**(-round(sigma_s2, digits=0) - 1))
-    return (gauche * droite) }
-  integrande_denominateur2 <- function(t) {
-    gauche <- 1 - (1 + sigma_d2 * phi_d[i,] * IDD2(alpha_d, alpha_s, delta, t_end, t))**(-round(sigma_d2, digits = 0) - 1)
-    droite <- phi_s[i,] * lambda_s(alpha_s, t) * (1 + (1 + sigma_s2 * phi_s[i,] * IS(alpha_s, t))**(-round(sigma_s2, digits=0) - 1))
-    return (gauche * droite) }
-  intervalle1 <- integrate(integrande_denominateur1, lower = 0.001, upper = t_end)$value
-  #intervalle2 <- integrate(integrande_denominateur2, lower = t_end, upper = 10)$value
-  denominateur <- intervalle1  #+ intervalle2
   # Résultat
-  return(numerateur / denominateur)
+  return(numerateur)
 }
 
 # Définir la fonction LClone_i
@@ -112,23 +99,8 @@ LClone_i <- function(alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s, delta, 
   numerateur1 <- (1 + sigma_d2 * phi_d[i])**(-round(sigma_d2) - 1)
   numerateur2 <- phi_d[i] * lambda_d(alpha_d, Td_seller) * (1 + sigma_s2 * phi_s[i] * IS(alpha_s, Td_clone))**(-round(sigma_s2) - 1)
   numerateur <- numerateur1 * numerateur2
-  
-  # Dénominateur
-  integrande_denominateur1 <- function(t) {
-    gauche <- 1 - (1 + sigma_d2 * phi_d[i,] * IDD1(alpha_d, alpha_s, delta, t_end, t))**(-round(sigma_d2, digits = 0) - 1)
-    droite <- phi_s[i,] * lambda_s(alpha_s, t) * (1 + (1 + sigma_s2 * phi_s[i,] * IS(alpha_s, t))**(-round(sigma_s2, digits=0) - 1))
-    return (gauche * droite) }
-  integrande_denominateur2 <- function(t) {
-    gauche <- 1 - (1 + sigma_d2 * phi_d[i,] * IDD2(alpha_d, alpha_s, delta, t_end, t))^{-round(sigma_d2, digits = 0) - 1}
-    droite <- phi_s[i,] * lambda_s(alpha_s, t) * (1 + (1 + sigma_s2 * phi_s[i,] * IS(alpha_s, t))**(-round(sigma_s2, digits=0) - 1))
-    return (gauche * droite) }
-  intervalle1 <- integrate(integrande_denominateur1, lower = 0.001, upper = t_end)$value
-  #intervalle2 <- integrate(integrande_denominateur2, lower = t_end, upper = 10)$value
-  denominateur <- intervalle1  #+ intervalle2
-  
   # Résultat
-  return(numerateur / denominateur)
-}
+  return(numerateur)}
 
 # Fonction de vraissemblance
 log_likelihood <- function(alpha_d, alpha_s, sigma_d2, sigma_s2, delta, beta_d_1, beta_d_2, beta_d_3, beta_d_4, beta_d_5, beta_d_6,
@@ -143,8 +115,9 @@ log_likelihood <- function(alpha_d, alpha_s, sigma_d2, sigma_s2, delta, beta_d_1
   L_seller_sum <- 0
   L_clone_sum <- 0
   for (i in 1:nrow(seller)) {
-    #print(LSeller_i(alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s, delta, i))
     Log_seller_i <- log(LSeller_i(alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s, delta, i))
+    print(LSeller_i(alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s, delta, i))
+    print(Log_seller_i)
     Log_clone_i <- log(LClone_i(alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s, delta, i))
     L_seller_sum <- L_seller_sum + Log_seller_i
     L_clone_sum <- L_clone_sum + Log_clone_i
