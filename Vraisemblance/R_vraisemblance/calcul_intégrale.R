@@ -163,6 +163,6 @@ integrande_denominateur <- function(t) {
   droite <- phi_s[i,] * lambda_s(alpha_s, t) * (1 + (1 + sigma_s2 * phi_s[i,] * IS(alpha_s, t))**(-round(sigma_s2, digits=0) - 1))
   return (gauche * droite) }
 
-x <- seq(0.001, 100000, 0.01)
+x <- seq(0.001, 1000, 0.01)
 y <- integrande_denominateur(x)
 plot(x,y)
