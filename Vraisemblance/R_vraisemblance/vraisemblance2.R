@@ -95,9 +95,10 @@ LSeller_i <- function(alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s, delta,
     droite <- phi_s[i,] * lambda_s(alpha_s, t) * (1 + (1 + sigma_s2 * phi_s[i,] * IS(alpha_s, t))**(-round(sigma_s2, digits=0) - 1))
     return (gauche * droite) }
   intervalle1 <- integrate(integrande_denominateur1, lower = 0.001, upper = t_end)$value
-  #intervalle2 <- integrate(integrande_denominateur2, lower = t_end, upper = 10)$value
+  intervalle2 <- integrate(integrande_denominateur2, lower = t_end, upper = 10)$value
   denominateur <- intervalle1  #+ intervalle2
   # Résultat
+  print(intervalle2)
   return(numerateur / denominateur)
 }
 
@@ -123,7 +124,7 @@ LClone_i <- function(alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s, delta, 
     droite <- phi_s[i,] * lambda_s(alpha_s, t) * (1 + (1 + sigma_s2 * phi_s[i,] * IS(alpha_s, t))**(-round(sigma_s2, digits=0) - 1))
     return (gauche * droite) }
   intervalle1 <- integrate(integrande_denominateur1, lower = 0.001, upper = t_end)$value
-  #intervalle2 <- integrate(integrande_denominateur2, lower = t_end, upper = 10)$value
+  intervalle2 <- integrate(integrande_denominateur2, lower = t_end, upper = 10)$value
   denominateur <- intervalle1  #+ intervalle2
   
   # Résultat
