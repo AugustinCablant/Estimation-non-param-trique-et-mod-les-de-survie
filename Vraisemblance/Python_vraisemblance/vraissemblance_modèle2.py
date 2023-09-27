@@ -42,7 +42,7 @@ def lambda_s(alpha_s, t):
 
 def IDD(alpha_d, alpha_s, delta, t_1, t_2): 
     if t_1 <= t_2: I = (np.exp(alpha_d * t_1) - 1) / alpha_d
-    else: I = ((1 - delta) * np.exp(alpha_d * t_2) + np.exp(alpha_d * t_1) - 1) / alpha_d
+    else: I = ((1 - delta) * np.exp(alpha_d * t_2) + delta * np.exp(alpha_d * t_1) - 1) / alpha_d
     return I 
 
 def ID(alpha_d,t):

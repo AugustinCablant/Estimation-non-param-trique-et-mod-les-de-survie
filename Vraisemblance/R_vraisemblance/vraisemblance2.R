@@ -36,22 +36,17 @@ phiS <- function(beta_s) {
 }
 
 IDD <- function(alpha_d, alpha_s, delta, t_1, t_2) {
-  if (t_1 <= t_2) {
-    I <- (exp(alpha_d * t_1) - 1) / alpha_d} 
-  else {I <- ((1 - delta) * exp(alpha_d * t_2) + exp(alpha_d * t_1) - 1) / alpha_d
+  n <- length(t_2)  # Nombre d'éléments dans le vecteur t_1
+  I <- numeric(n)   # Initialiser un vecteur vide pour stocker les résultats
+  for (i in 1:n) {
+    if (t_1<= t_2[i]) {
+      I[i] <- (exp(alpha_d * t_1) - 1) / alpha_d
+    } else {
+      I[i] <- ((1 - delta) * exp(alpha_d * t_2[i] ) + delta * exp(alpha_d * t_1) - 1) / alpha_d
+    }
   }
   return(I)
 }
-
-#variante de IDD car je rencontre des problèmes dans le calcul des intégrales
-#ici c'est le cas où t_1 <= t_2 (ça sera notre intégrale avec intervalle 1)
-IDD1 <- function(alpha_d, alpha_s, delta, t_1, t_2) {
-  I <- (exp(alpha_d * t_1) - 1) / alpha_d
-  return(I)}
-
-IDD2 <- function(alpha_d, alpha_s, delta, t_1, t_2) {
-  I <- ((1 - delta) * exp(alpha_d * t_2) + exp(alpha_d * t_1) - 1) / alpha_d
-  return(I)}
 
 # Définir la fonction lambda_d 
 lambda_d <- function(alpha_d, t) {
@@ -86,19 +81,13 @@ LSeller_i <- function(alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s, delta,
   numerateur <- numerateur1 * numerateur2 * numerateur3
 
   # Dénominateur
-  integrande_denominateur1 <- function(t) {
-    gauche <- 1 - (1 + sigma_d2 * phi_d[i,] * IDD1(alpha_d, alpha_s, delta, t_end, t))**(-round(sigma_d2, digits = 0) - 1)
+  integrande_denominateur <- function(t) {
+    gauche <- 1 - (1 + sigma_d2 * phi_d[i,] * IDD(alpha_d, alpha_s, delta, t_end, t))**(-round(sigma_d2, digits = 0) - 1)
     droite <- phi_s[i,] * lambda_s(alpha_s, t) * (1 + (1 + sigma_s2 * phi_s[i,] * IS(alpha_s, t))**(-round(sigma_s2, digits=0) - 1))
     return (gauche * droite) }
-  integrande_denominateur2 <- function(t) {
-    gauche <- 1 - (1 + sigma_d2 * phi_d[i,] * IDD2(alpha_d, alpha_s, delta, t_end, t))**(-round(sigma_d2, digits = 0) - 1)
-    droite <- phi_s[i,] * lambda_s(alpha_s, t) * (1 + (1 + sigma_s2 * phi_s[i,] * IS(alpha_s, t))**(-round(sigma_s2, digits=0) - 1))
-    return (gauche * droite) }
-  intervalle1 <- integrate(integrande_denominateur1, lower = 0.001, upper = t_end)$value
-  #intervalle2 <- integrate(integrande_denominateur2, lower = t_end + 0.001, upper = t_end + 1.001)$value
-  denominateur <- intervalle1  #+ intervalle2
-  # Résultat
   
+  denominateur <- integrate(integrande_denominateur, lower = 0.001, upper = 10)$value
+  # Résultat
   return(numerateur / denominateur)
 }
 
@@ -115,18 +104,11 @@ LClone_i <- function(alpha_d, alpha_s, sigma_d2, sigma_s2, phi_d, phi_s, delta, 
   numerateur <- numerateur1 * numerateur2
   
   # Dénominateur
-  integrande_denominateur1 <- function(t) {
-    gauche <- 1 - (1 + sigma_d2 * phi_d[i,] * IDD1(alpha_d, alpha_s, delta, t_end, t))**(-round(sigma_d2, digits = 0) - 1)
+  integrande_denominateur <- function(t) {
+    gauche <- 1 - (1 + sigma_d2 * phi_d[i,] * IDD(alpha_d, alpha_s, delta, t_end, t))**(-round(sigma_d2, digits = 0) - 1)
     droite <- phi_s[i,] * lambda_s(alpha_s, t) * (1 + (1 + sigma_s2 * phi_s[i,] * IS(alpha_s, t))**(-round(sigma_s2, digits=0) - 1))
     return (gauche * droite) }
-  integrande_denominateur2 <- function(t) {
-    gauche <- 1 - (1 + sigma_d2 * phi_d[i,] * IDD2(alpha_d, alpha_s, delta, t_end, t))^{-round(sigma_d2, digits = 0) - 1}
-    droite <- phi_s[i,] * lambda_s(alpha_s, t) * (1 + (1 + sigma_s2 * phi_s[i,] * IS(alpha_s, t))**(-round(sigma_s2, digits=0) - 1))
-    return (gauche * droite) }
-  intervalle1 <- integrate(integrande_denominateur1, lower = 0.001, upper = t_end)$value
-  #intervalle2 <- integrate(integrande_denominateur2, lower = t_end, upper = 10)$value
-  denominateur <- intervalle1  #+ intervalle2
-  
+  denominateur <- integrate(integrande_denominateur, lower = 0.001, upper = 10)$value
   # Résultat
   return(numerateur / denominateur)
 }
@@ -151,8 +133,8 @@ log_likelihood <- function(alpha_d, alpha_s, sigma_d2, sigma_s2, delta, beta_d_1
     L_clone_sum <- L_clone_sum + Log_clone_i
   }
   Likelihood <- (L_seller_sum + L_clone_sum) / nrow(seller)
-  print(Likelihood)
   return(-Likelihood)}
+
 
 # Minimisation de l'opposé de la log-vraisemblance
 estim <- mle2(log_likelihood, start = list(alpha_d = -1.59337252e-01, alpha_s = -8.31844675e-01, sigma_d2 = 1.37925407e-03, sigma_s2 = 
