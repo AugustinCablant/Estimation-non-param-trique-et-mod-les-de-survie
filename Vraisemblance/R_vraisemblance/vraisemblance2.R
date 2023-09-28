@@ -7,7 +7,7 @@ library(pracma)
 
 # Charger les données
 seller <- read.csv('Data/dataset_vraissemblance.csv')
-facteur_de_normalisation <- 10 ^ (-5)
+facteur_de_normalisation <- 10 ^ (-4)
 
 # Colonnes que l'on utilise
 X <- c('sexe_femme', 'idf', 'etranger', 'dec1', 'dec2', 'dec3')
@@ -132,6 +132,7 @@ log_likelihood <- function(alpha_d, alpha_s, sigma_d2, sigma_s2, delta, beta_d_1
   # beta_d et beta_s des vecteurs de taille 6
   beta_d <- c(beta_d_1, beta_d_2, beta_d_3, beta_d_4, beta_d_5, beta_d_6)
   beta_s <- c(beta_s_1, beta_s_2, beta_s_3, beta_s_4, beta_s_5, beta_s_6)
+  #print("beta_s : ", beta_s)
   phi_d <- phiD(beta_d)
   phi_s <- phiS(beta_s)
   L_seller_sum <- 0
@@ -154,5 +155,8 @@ estim <- mle2(log_likelihood, start = list(alpha_d = 1.5, alpha_s = 1.2, sigma_d
                                       beta_d_1 = -1.83292187e-01, beta_d_2 = -4.64990779e-03, beta_d_3 = -7.75338530e-02, 
                                       beta_d_4 = 3.41439558e-01, beta_d_5 = 1.74069565e-01, beta_d_6 = 2.85908646e-02, 
                                       beta_s_1 = 2.97050800e-02, beta_s_2 = -9.56602490e-02, beta_s_3 = -3.41291509e-02, 
-                                      beta_s_4 = 9.31972376e-02, beta_s_5 = 6.91866371e-02, beta_s_6 = 9.63147673e-02))
+                                      beta_s_4 = 9.31972376e-02, beta_s_5 = 6.91866371e-02, beta_s_6 = 9.63147673e-02),
+                                      method="L-BFGS-B", optimizer = "nlminb", 
+                                      fixed = c(alpha_d = 1.5, alpha_s = 1.2, sigma_d2 = 0.1, sigma_s2 = 
+                                      2.3))
 print(summary(estim))
