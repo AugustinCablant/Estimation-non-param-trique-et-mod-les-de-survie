@@ -2,7 +2,7 @@
 #install.packages("Rmpfr")
 # Charger les bibliothèques
 library(readr)
-library(stats)
+library(stats4)
 library(Matrix)
 library(numDeriv)
 library(bbmle)
@@ -134,9 +134,9 @@ log_likelihood <- function(lambda_d, lambda_s, delta, beta_d_1, beta_d_2, beta_d
 
 # Minimisation de l'opposé de la log-vraisemblance
 estim <- mle2(log_likelihood, start = list(lambda_d = 8.84172963, lambda_s = 1.23516850, delta = 7.17338893e-01, 
-                                      beta_d_1 = -1.83292187e-01, beta_d_2 = -4.64990779e-03, beta_d_3 = -7.75338530e-02, 
-                                      beta_d_4 = 3.41439558e-01, beta_d_5 = 1.74069565e-01, beta_d_6 = 2.85908646e-02, 
-                                      beta_s_1 = 2.97050800e-02, beta_s_2 = -9.56602490e-02, beta_s_3 = -3.41291509e-02, 
-                                      beta_s_4 = 9.31972376e-02, beta_s_5 = 6.91866371e-02, beta_s_6 = 9.63147673e-02),
+                                      beta_d_1 = runif(1,min = -1, max = 1), beta_d_2 = runif(1,min = -1, max = 1), beta_d_3 = runif(1,min = -1, max = 1), 
+                                      beta_d_4 = runif(1,min = -1, max = 1), beta_d_5 = runif(1,min = -1, max = 1), beta_d_6 = runif(1,min = -1, max = 1), 
+                                      beta_s_1 = runif(1,min = -1, max = 1), beta_s_2 = runif(1,min = -1, max = 1), beta_s_3 = runif(1,min = -1, max = 1), 
+                                      beta_s_4 = runif(1,min = -1, max = 1), beta_s_5 = runif(1,min = -1, max = 1), beta_s_6 = runif(1,min = -1, max = 1)),
                                       method="L-BFGS-B", optimizer = "nlminb")
 print(summary(estim))

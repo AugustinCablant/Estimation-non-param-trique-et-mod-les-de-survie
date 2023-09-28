@@ -120,5 +120,6 @@ estim <- mle2(log_likelihood, start = list(lambda_d = 8.84172963, lambda_s = 1.2
                                       beta_d_1 = -1.83292187e-01, beta_d_2 = -4.64990779e-03, beta_d_3 = -7.75338530e-02, 
                                       beta_d_4 = 3.41439558e-01, beta_d_5 = 1.74069565e-01, beta_d_6 = 2.85908646e-02, 
                                       beta_s_1 = 2.97050800e-02, beta_s_2 = -9.56602490e-02, beta_s_3 = -3.41291509e-02, 
-                                      beta_s_4 = 9.31972376e-02, beta_s_5 = 6.91866371e-02, beta_s_6 = 9.63147673e-02))
+                                      beta_s_4 = 9.31972376e-02, beta_s_5 = 6.91866371e-02, beta_s_6 = 9.63147673e-02),
+                                      method="L-BFGS-B", optimizer = "nlminb", hessian = TRUE)
 print(summary(estim))
