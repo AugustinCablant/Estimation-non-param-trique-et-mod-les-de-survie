@@ -6,6 +6,7 @@ library(stats)
 library(Matrix)
 library(numDeriv)
 library(bbmle)
+library(stats4)
 
 # Charger les données
 seller <- read.csv('Data/dataset_vraissemblance.csv')
